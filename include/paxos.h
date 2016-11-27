@@ -21,6 +21,7 @@ namespace Paxos {
     PermissionRequestMessage request_permission();
   private:
     const std::string m_node_id;
+    ProposalID m_highest_proposal;
   };
 }
 

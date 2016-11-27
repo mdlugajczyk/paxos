@@ -9,8 +9,10 @@ PermissionRequestMessage::PermissionRequestMessage(const ProposalID &id)
   : m_id(id) {}
 
 PermissionRequestMessage Proposer::request_permission() {
-  return PermissionRequestMessage(ProposalID(m_node_id, 1));
+  const ProposalID id(m_node_id, m_highest_proposal.m_proposal_id + 1);
+  m_highest_proposal = id;
+  return PermissionRequestMessage(id);
 }
 
 Proposer::Proposer(const std::string &id)
-  : m_node_id(id) {}
+  : m_node_id(id), m_highest_proposal(m_node_id, 0) {}
