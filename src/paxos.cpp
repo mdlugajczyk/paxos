@@ -3,23 +3,20 @@
 using namespace Paxos;
 
 QuorumTooSmallException::QuorumTooSmallException()
-  : std::runtime_error("Quorum size can't be smaller than 2.") {}
+    : std::runtime_error("Quorum size can't be smaller than 2.") {}
 
 ProposalID::ProposalID(const std::string &node_id, const int proposal_id)
-  : m_node_id(node_id), m_proposal_id(proposal_id) {}
+    : m_node_id(node_id), m_proposal_id(proposal_id) {}
 
-PermissionRequestMessage::PermissionRequestMessage(const ProposalID &id)
-  : m_id(id) {}
-
-PermissionRequestMessage Proposer::request_permission() {
+Message::PermissionRequest Proposer::request_permission() {
   const ProposalID id(m_node_id, m_highest_proposal.m_proposal_id + 1);
   m_highest_proposal = id;
-  return PermissionRequestMessage(id);
+  return Message::PermissionRequest(id);
 }
 
 Proposer::Proposer(const std::string &id, const int quorum_size)
-  : m_node_id(id), m_quorum_size(quorum_size),
-    m_highest_proposal(m_node_id, 0) {
+    : m_node_id(id), m_quorum_size(quorum_size),
+      m_highest_proposal(m_node_id, 0) {
   if (m_quorum_size < 2) {
     throw QuorumTooSmallException();
   }
