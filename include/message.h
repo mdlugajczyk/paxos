@@ -5,9 +5,11 @@
 
 namespace Paxos {
 
+typedef std::string NodeID;
+
 struct ProposalID {
-  ProposalID(const std::string &node_id, const int proposal_id);
-  std::string m_node_id;
+  ProposalID(const NodeID &node_id, const int proposal_id);
+  NodeID m_node_id;
   int m_proposal_id;
 };
 
