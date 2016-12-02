@@ -5,9 +5,6 @@ using namespace Paxos;
 QuorumTooSmallException::QuorumTooSmallException()
     : std::runtime_error("Quorum size can't be smaller than 2.") {}
 
-ProposalID::ProposalID(const std::string &node_id, const int proposal_id)
-    : m_node_id(node_id), m_proposal_id(proposal_id) {}
-
 Message::PermissionRequest Proposer::request_permission() {
   const ProposalID id(m_node_id, m_highest_proposal.m_proposal_id + 1);
   m_highest_proposal = id;

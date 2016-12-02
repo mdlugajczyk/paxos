@@ -3,6 +3,9 @@
 using namespace Paxos;
 using namespace Paxos::Message;
 
+ProposalID::ProposalID(const std::string &node_id, const int proposal_id)
+    : m_node_id(node_id), m_proposal_id(proposal_id) {}
+
 Paxos::Message::Message::Message(const enum Type type) : m_type(type) {}
 
 Paxos::Message::Message::~Message() {}
