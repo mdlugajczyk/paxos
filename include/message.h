@@ -19,9 +19,10 @@ enum class Type { PermissionRequest };
 
 class Message {
 public:
-  Message(const enum Type type);
+  Message(const enum Type type, const NodeID &sender_id);
   virtual ~Message();
   const enum Type m_type;
+  const NodeID m_sender_id;
 };
 
 class PermissionRequest : public Message {
