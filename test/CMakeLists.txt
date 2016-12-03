@@ -39,9 +39,8 @@ set_target_properties(libgmock PROPERTIES
 include_directories("${source_dir}/googletest/include"
                     "${source_dir}/googlemock/include")
 
-file(GLOB SRCS *.cpp)
-
-ADD_EXECUTABLE(test_paxos ${SRCS})
+ADD_EXECUTABLE(test_paxos test_paxos.cpp)
+ADD_EXECUTABLE(test_message test_message.cpp)
 
 TARGET_LINK_LIBRARIES(test_paxos
     libpaxos
@@ -49,5 +48,14 @@ TARGET_LINK_LIBRARIES(test_paxos
     libgmock
 )
 
+TARGET_LINK_LIBRARIES(test_message
+    libpaxos
+    libgtest
+    libgmock
+)
+
 add_test(NAME test_paxos
-         COMMAND test_paxos)
+  COMMAND test_paxos)
+
+add_test(NAME test_message
+  COMMAND test_message)

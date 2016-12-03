@@ -1,14 +1,13 @@
-#include <cstdint>
-#include "gtest/gtest.h"
-#include <iostream>
 #include "paxos.h"
+#include "gtest/gtest.h"
+#include <cstdint>
+#include <iostream>
 
 using namespace Paxos;
 
 class PaxosTest : public ::testing::Test {
 public:
-  virtual void SetUp() {
-  }
+  virtual void SetUp() {}
 };
 
 TEST_F(PaxosTest, ProposerRequestPermission) {

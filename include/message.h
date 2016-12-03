@@ -9,6 +9,7 @@ typedef std::string NodeID;
 
 struct ProposalID {
   ProposalID(const NodeID &node_id, const int proposal_id);
+  bool operator<(const ProposalID &other) const;
   NodeID m_node_id;
   int m_proposal_id;
 };

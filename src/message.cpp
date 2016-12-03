@@ -6,6 +6,12 @@ using namespace Paxos::Message;
 ProposalID::ProposalID(const NodeID &node_id, const int proposal_id)
     : m_node_id(node_id), m_proposal_id(proposal_id) {}
 
+bool ProposalID::operator<(const Paxos::ProposalID &other) const {
+  if (m_proposal_id == other.m_proposal_id)
+    return m_node_id < other.m_node_id;
+  return m_proposal_id < other.m_proposal_id;
+}
+
 Paxos::Message::Message::Message(const enum Type type, const NodeID &sender_id)
     : m_type(type), m_sender_id(sender_id) {}
 
