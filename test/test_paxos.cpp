@@ -29,6 +29,28 @@ TEST_F(PaxosTest, ProposerCantBeCreatedWithQuorumBelow2) {
   ASSERT_THROW(Proposer("foo", 1), QuorumTooSmallException);
 }
 
+TEST_F(PaxosTest, ReceiveLessThanQuorumRejectedMessagesAfterProposal) {
+  Proposer p("foo", 2);
+  const auto permission_msg = p.request_permission();
+  const Message::NoAck noack("bar", permission_msg.m_id, ProposalID("baz", 2));
+  const auto nack_response = p.process_noack(noack);
+  ASSERT_FALSE(nack_response);
+}
+
+TEST_F(PaxosTest, IfQuorumRejectedProposalShouldSendNew) {
+  Proposer p("foo", 2);
+  const auto permission_msg = p.request_permission();
+  const ProposalID accepted_proposal("baz", 3);
+  const Message::NoAck noack1("bar", permission_msg.m_id, accepted_proposal);
+  p.process_noack(noack1);
+  const Message::NoAck noack2("baz", permission_msg.m_id, accepted_proposal);
+  const auto noack_response = p.process_noack(noack2);
+  ASSERT_TRUE(noack_response);
+  ASSERT_EQ(noack_response->m_sender_id, "foo");
+  ASSERT_EQ(noack_response->m_id.m_node_id, "foo");
+  ASSERT_EQ(noack_response->m_id.m_proposal_id, 4);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
