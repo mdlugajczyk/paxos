@@ -15,10 +15,10 @@ Message::PermissionRequest Proposer::request_permission() {
 
 optional<Message::PermissionRequest>
 Proposer::process_noack(const Message::NoAck &noack) {
-  if (m_current_proposal != noack.m_rejected_proposal)
-    return {};
   if (m_highest_proposal < noack.m_accepted_proposal)
     m_highest_proposal = noack.m_accepted_proposal;
+  if (m_current_proposal != noack.m_rejected_proposal)
+    return {};
   m_noack_senders.push_back(noack.m_sender_id);
   if (m_noack_senders.size() >= m_quorum_size)
     return request_permission();

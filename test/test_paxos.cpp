@@ -63,6 +63,17 @@ TEST_F(PaxosTest, IgnoreQuorumRejectingSomeoneElseProposal) {
   ASSERT_FALSE(noack_response);
 }
 
+TEST_F(PaxosTest, ObserverNoAcksForHighestProposalID) {
+  Proposer p("foo", 2);
+  p.request_permission();
+  const ProposalID accepted_proposal("bar", 4);
+  const Message::NoAck noack("bar", ProposalID("baz", 3), accepted_proposal);
+  p.process_noack(noack);
+  const auto permission_request = p.request_permission();
+  ASSERT_EQ(permission_request.m_id,
+            ProposalID("foo", accepted_proposal.m_proposal_id + 1));
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
