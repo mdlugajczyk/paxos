@@ -9,11 +9,14 @@ QuorumTooSmallException::QuorumTooSmallException()
 Message::PermissionRequest Proposer::request_permission() {
   const ProposalID id(m_node_id, m_highest_proposal.m_proposal_id + 1);
   m_highest_proposal = id;
+  m_current_proposal = id;
   return Message::PermissionRequest(id);
 }
 
 optional<Message::PermissionRequest>
 Proposer::process_noack(const Message::NoAck &noack) {
+  if (m_current_proposal != noack.m_rejected_proposal)
+    return {};
   if (m_highest_proposal < noack.m_accepted_proposal)
     m_highest_proposal = noack.m_accepted_proposal;
   m_noack_senders.push_back(noack.m_sender_id);
@@ -24,7 +27,7 @@ Proposer::process_noack(const Message::NoAck &noack) {
 
 Proposer::Proposer(const std::string &id, const int quorum_size)
     : m_node_id(id), m_quorum_size(quorum_size),
-      m_highest_proposal(m_node_id, 0) {
+      m_highest_proposal(m_node_id, 0), m_current_proposal(m_node_id, 0) {
   if (m_quorum_size < 2) {
     throw QuorumTooSmallException();
   }

@@ -24,6 +24,7 @@ private:
   const std::string m_node_id;
   const int m_quorum_size;
   ProposalID m_highest_proposal;
+  ProposalID m_current_proposal;
   std::vector<NodeID> m_noack_senders;
 };
 }

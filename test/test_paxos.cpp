@@ -51,6 +51,18 @@ TEST_F(PaxosTest, IfQuorumRejectedProposalShouldSendNew) {
   ASSERT_EQ(noack_response->m_id.m_proposal_id, 4);
 }
 
+TEST_F(PaxosTest, IgnoreQuorumRejectingSomeoneElseProposal) {
+  Proposer p("foo", 2);
+  const auto permission_msg = p.request_permission();
+  const ProposalID accepted_proposal("baz", 3);
+  const ProposalID rejected_proposal("bar", 4);
+  const Message::NoAck noack1("bar", rejected_proposal, accepted_proposal);
+  p.process_noack(noack1);
+  const Message::NoAck noack2("baz", rejected_proposal, accepted_proposal);
+  const auto noack_response = p.process_noack(noack2);
+  ASSERT_FALSE(noack_response);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
