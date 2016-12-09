@@ -20,6 +20,27 @@ TEST_F(MessageTest, IfIDsEqualCompareNodeIDs) {
   ASSERT_TRUE(p2 < p1);
 }
 
+TEST_F(MessageTest, CompareIDsDifferentNodes) {
+  const ProposalID p1("b", 2);
+  const ProposalID p2("a", 2);
+  ASSERT_FALSE(p2 == p1);
+  ASSERT_TRUE(p2 != p1);
+}
+
+TEST_F(MessageTest, CompareIDsDifferentProposals) {
+  const ProposalID p1("a", 2);
+  const ProposalID p2("a", 3);
+  ASSERT_FALSE(p2 == p1);
+  ASSERT_TRUE(p2 != p1);
+}
+
+TEST_F(MessageTest, CompareIdenticalProposals) {
+  const ProposalID p1("a", 2);
+  const ProposalID p2("a", 2);
+  ASSERT_TRUE(p2 == p1);
+  ASSERT_FALSE(p2 != p1);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();

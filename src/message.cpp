@@ -12,6 +12,14 @@ bool ProposalID::operator<(const Paxos::ProposalID &other) const {
   return m_proposal_id < other.m_proposal_id;
 }
 
+bool ProposalID::operator==(const Paxos::ProposalID &other) const {
+  return m_node_id == other.m_node_id && m_proposal_id == other.m_proposal_id;
+}
+
+bool ProposalID::operator!=(const Paxos::ProposalID &other) const {
+  return !operator==(other);
+}
+
 Paxos::Message::Message::Message(const enum Type type, const NodeID &sender_id)
     : m_type(type), m_sender_id(sender_id) {}
 
