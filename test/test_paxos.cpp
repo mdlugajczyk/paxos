@@ -63,7 +63,7 @@ TEST_F(PaxosTest, IgnoreQuorumRejectingSomeoneElseProposal) {
   ASSERT_FALSE(noack_response);
 }
 
-TEST_F(PaxosTest, ObserverNoAcksForHighestProposalID) {
+TEST_F(PaxosTest, CheckNoAcksForHighestProposalID) {
   Proposer p("foo", 2);
   p.request_permission();
   const ProposalID accepted_proposal("bar", 4);
