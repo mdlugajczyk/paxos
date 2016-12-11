@@ -6,14 +6,14 @@ using namespace std::experimental;
 QuorumTooSmallException::QuorumTooSmallException()
     : std::runtime_error("Quorum size can't be smaller than 2.") {}
 
-Message::PermissionRequest Proposer::request_permission() {
+Message::PrepareMessage Proposer::request_permission() {
   const ProposalID id(m_node_id, m_highest_proposal.m_proposal_id + 1);
   m_highest_proposal = id;
   m_current_proposal = id;
-  return Message::PermissionRequest(id);
+  return Message::PrepareMessage(id);
 }
 
-optional<Message::PermissionRequest>
+optional<Message::PrepareMessage>
 Proposer::process_noack(const Message::NoAck &noack) {
   if (m_highest_proposal < noack.m_accepted_proposal)
     m_highest_proposal = noack.m_accepted_proposal;

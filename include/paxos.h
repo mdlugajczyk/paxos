@@ -16,9 +16,9 @@ public:
 class Proposer {
 public:
   explicit Proposer(const std::string &id, const int quorum_size);
-  Message::PermissionRequest request_permission();
-  std::experimental::optional<Message::PermissionRequest>
-  process_noack(const Message::NoAck &noack);
+  Message::PrepareMessage request_permission();
+  std::experimental::optional<Message::PrepareMessage>
+    process_noack(const Message::NoAck &noack);
 
 private:
   const std::string m_node_id;

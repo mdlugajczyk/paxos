@@ -18,7 +18,7 @@ struct ProposalID {
 
 namespace Message {
 
-enum class Type { PermissionRequest, NoAck };
+enum class Type { Prepare, NoAck };
 
 class Message {
 public:
@@ -28,9 +28,9 @@ public:
   const NodeID m_sender_id;
 };
 
-class PermissionRequest : public Message {
+class PrepareMessage : public Message {
 public:
-  PermissionRequest(const ProposalID &id);
+  PrepareMessage(const ProposalID &id);
   const ProposalID m_id;
 };
 
