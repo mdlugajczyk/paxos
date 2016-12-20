@@ -74,6 +74,44 @@ TEST_F(PaxosTest, CheckNoAcksForHighestProposalID) {
             ProposalID("foo", accepted_proposal.m_proposal_id + 1));
 }
 
+TEST_F(PaxosTest, DontActOnPromisesUntilQuorumIsReached) {
+  Proposer p("foo", 2);
+  const auto prepare_msg = p.request_permission();
+  const auto response =
+      p.process_promise(Message::PromiseMessage(prepare_msg.m_id, "bar"));
+  ASSERT_FALSE(response);
+}
+
+TEST_F(PaxosTest, IfEnoughPromisesReceivedAcceptMessageShouldBeSent) {
+  Proposer p("foo", 2);
+  const auto prepare_msg = p.request_permission();
+  p.process_promise(Message::PromiseMessage(prepare_msg.m_id, "bar"));
+  const auto response =
+      p.process_promise(Message::PromiseMessage(prepare_msg.m_id, "baz"));
+  ASSERT_TRUE(response);
+  ASSERT_EQ(response->m_id, prepare_msg.m_id);
+  ASSERT_EQ(response->m_sender_id, "foo");
+}
+
+TEST_F(PaxosTest, DontActOnPromisesForDifferentProposals) {
+  Proposer p("foo", 2);
+  const auto prepare_msg = p.request_permission();
+  p.process_promise(Message::PromiseMessage(prepare_msg.m_id, "bar"));
+  const auto response = p.process_promise(Message::PromiseMessage(
+      ProposalID("foo", prepare_msg.m_id.m_proposal_id + 1), "baz"));
+  ASSERT_FALSE(response);
+}
+
+TEST_F(PaxosTest, CheckPromisesForHigherProposalID) {
+  Proposer p("foo", 2);
+  const auto prepare_msg = p.request_permission();
+  p.process_promise(Message::PromiseMessage(
+      ProposalID("foo", prepare_msg.m_id.m_proposal_id + 1), "baz"));
+  const auto prepare_msg2 = p.request_permission();
+  ASSERT_EQ(prepare_msg2.m_id.m_proposal_id,
+            prepare_msg.m_id.m_proposal_id + 2);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();

@@ -25,6 +25,18 @@ Proposer::process_noack(const Message::NoAck &noack) {
   return {};
 }
 
+optional<Message::AcceptMessage>
+Proposer::process_promise(const Message::PromiseMessage &promise) {
+  if (m_highest_proposal < promise.m_id)
+    m_highest_proposal = promise.m_id;
+  if (promise.m_id != m_current_proposal)
+    return {};
+  m_promise_senders.push_back(promise.m_sender_id);
+  if (m_promise_senders.size() >= m_quorum_size)
+    return Message::AcceptMessage(m_current_proposal);
+  return {};
+}
+
 Proposer::Proposer(const std::string &id, const int quorum_size)
     : m_node_id(id), m_quorum_size(quorum_size),
       m_highest_proposal(m_node_id, 0), m_current_proposal(m_node_id, 0) {

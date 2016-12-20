@@ -19,6 +19,8 @@ public:
   Message::PrepareMessage request_permission();
   std::experimental::optional<Message::PrepareMessage>
     process_noack(const Message::NoAck &noack);
+  std::experimental::optional<Message::AcceptMessage>
+    process_promise(const Message::PromiseMessage &noack);
 
 private:
   const std::string m_node_id;
@@ -26,6 +28,7 @@ private:
   ProposalID m_highest_proposal;
   ProposalID m_current_proposal;
   std::vector<NodeID> m_noack_senders;
+  std::vector<NodeID> m_promise_senders;
 };
 }
 #endif

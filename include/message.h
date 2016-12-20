@@ -18,7 +18,7 @@ struct ProposalID {
 
 namespace Message {
 
-enum class Type { Prepare, NoAck };
+  enum class Type { Prepare, Promise, Accept, NoAck };
 
 class Message {
 public:
@@ -31,6 +31,18 @@ public:
 class PrepareMessage : public Message {
 public:
   PrepareMessage(const ProposalID &id);
+  const ProposalID m_id;
+};
+
+class PromiseMessage : public Message {
+public:
+  PromiseMessage(const ProposalID &id, const NodeID &sender_id);
+  const ProposalID m_id;
+};
+
+class AcceptMessage : public Message {
+public:
+  AcceptMessage(const ProposalID &id);
   const ProposalID m_id;
 };
 
