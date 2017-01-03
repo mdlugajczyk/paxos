@@ -15,7 +15,7 @@ public:
 
 class Proposer {
 public:
-  explicit Proposer(const std::string &id, const int quorum_size);
+  Proposer(const std::string &id, const int quorum_size);
   Message::PrepareMessage request_permission();
   std::experimental::optional<Message::PrepareMessage>
     process_noack(const Message::NoAck &noack);
