@@ -37,6 +37,7 @@ public:
   std::unique_ptr<Message::Message> process_prepare(const Message::PrepareMessage &msg);
 private:
   const std::string m_node_id;
+  ProposalID m_highest_proposal;
 };
 }
 #endif

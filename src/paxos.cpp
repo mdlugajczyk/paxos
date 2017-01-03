@@ -45,10 +45,17 @@ Proposer::Proposer(const std::string &id, const int quorum_size)
   }
 }
 
-Acceptor::Acceptor(const std::string &id) : m_node_id(id) {}
+Acceptor::Acceptor(const std::string &id)
+    : m_node_id(id), m_highest_proposal(m_node_id, 0) {}
 
 std::unique_ptr<Message::Message>
 Acceptor::process_prepare(const Message::PrepareMessage &prepare) {
-  return std::make_unique<Message::PromiseMessage>(prepare.m_proposal_id,
-                                                   m_node_id);
+  if (m_highest_proposal < prepare.m_proposal_id) {
+    m_highest_proposal = prepare.m_proposal_id;
+    return std::make_unique<Message::PromiseMessage>(prepare.m_proposal_id,
+                                                     m_node_id);
+  }
+
+  return std::make_unique<Message::NoAck>(m_node_id, prepare.m_proposal_id,
+                                          m_highest_proposal);
 }
