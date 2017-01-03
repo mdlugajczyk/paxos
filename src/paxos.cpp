@@ -44,3 +44,11 @@ Proposer::Proposer(const std::string &id, const int quorum_size)
     throw QuorumTooSmallException();
   }
 }
+
+Acceptor::Acceptor(const std::string &id) : m_node_id(id) {}
+
+std::unique_ptr<Message::Message>
+Acceptor::process_prepare(const Message::PrepareMessage &prepare) {
+  return std::make_unique<Message::PromiseMessage>(prepare.m_proposal_id,
+                                                   m_node_id);
+}

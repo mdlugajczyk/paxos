@@ -115,6 +115,15 @@ TEST_F(PaxosTest, CheckPromisesForHigherProposalID) {
             prepare_msg.m_proposal_id.m_proposal_id + 2);
 }
 
+TEST_F(PaxosTest, AcceptorRespondsWithPromiseToPrepareMessage) {
+  Acceptor a("foo");
+  const Message::PrepareMessage prepare_msg(ProposalID("bar", 2));
+  const auto response = a.process_prepare(prepare_msg);
+  ASSERT_EQ(response->m_type, Message::Type::Promise);
+  ASSERT_EQ(response->m_proposal_id, prepare_msg.m_proposal_id);
+  ASSERT_EQ(response->m_sender_id, "foo");
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();

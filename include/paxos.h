@@ -30,5 +30,13 @@ private:
   std::vector<NodeID> m_noack_senders;
   std::vector<NodeID> m_promise_senders;
 };
+
+class Acceptor {
+public:
+  explicit Acceptor(const std::string &id);
+  std::unique_ptr<Message::Message> process_prepare(const Message::PrepareMessage &msg);
+private:
+  const std::string m_node_id;
+};
 }
 #endif
