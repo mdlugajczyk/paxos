@@ -20,21 +20,22 @@ bool ProposalID::operator!=(const Paxos::ProposalID &other) const {
   return !operator==(other);
 }
 
-Paxos::Message::Message::Message(const enum Type type, const NodeID &sender_id)
-    : m_type(type), m_sender_id(sender_id) {}
+Paxos::Message::Message::Message(const enum Type type, const NodeID &sender_id,
+                                 const ProposalID &proposal_id)
+    : m_type(type), m_sender_id(sender_id), m_proposal_id(proposal_id) {}
 
 Paxos::Message::Message::~Message() {}
 
 PrepareMessage::PrepareMessage(const ProposalID &id)
-    : Message(Type::Prepare, id.m_node_id), m_id(id) {}
+    : Message(Type::Prepare, id.m_node_id, id) {}
 
 NoAck::NoAck(const NodeID &sender_id, const ProposalID &rejected_proposal,
              const ProposalID &accepted_proposal)
-    : Message(Type::NoAck, sender_id), m_rejected_proposal(rejected_proposal),
+    : Message(Type::NoAck, sender_id, rejected_proposal),
       m_accepted_proposal(accepted_proposal) {}
 
 PromiseMessage::PromiseMessage(const ProposalID &id, const NodeID &node_id)
-    : Message(Type::Promise, node_id), m_id(id) {}
+    : Message(Type::Promise, node_id, id) {}
 
 AcceptMessage::AcceptMessage(const ProposalID &id)
-    : Message(Type::Accept, id.m_node_id), m_id(id) {}
+    : Message(Type::Accept, id.m_node_id, id) {}
