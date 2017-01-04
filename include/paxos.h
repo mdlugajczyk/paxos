@@ -15,12 +15,13 @@ public:
 
 class Proposer {
 public:
-  Proposer(const std::string &id, const int quorum_size, const std::string &value);
+  Proposer(const std::string &id, const int quorum_size,
+           const std::string &value);
   Message::PrepareMessage request_permission();
   std::experimental::optional<Message::PrepareMessage>
-    process_noack(const Message::NoAck &noack);
+  process_noack(const Message::NoAck &noack);
   std::experimental::optional<Message::AcceptMessage>
-    process_promise(const Message::PromiseMessage &noack);
+  process_promise(const Message::PromiseMessage &noack);
 
 private:
   const std::string m_node_id;
@@ -35,7 +36,9 @@ private:
 class Acceptor {
 public:
   explicit Acceptor(const std::string &id);
-  std::unique_ptr<Message::Message> process_prepare(const Message::PrepareMessage &msg);
+  std::unique_ptr<Message::Message>
+  process_prepare(const Message::PrepareMessage &msg);
+
 private:
   const std::string m_node_id;
   ProposalID m_highest_proposal;

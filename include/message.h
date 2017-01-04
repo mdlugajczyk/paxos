@@ -18,11 +18,12 @@ struct ProposalID {
 
 namespace Message {
 
-  enum class Type { Prepare, Promise, Accept, NoAck };
+enum class Type { Prepare, Promise, Accept, NoAck };
 
 class Message {
 public:
-  Message(const enum Type type, const NodeID &sender_id, const ProposalID &proposal_id);
+  Message(const enum Type type, const NodeID &sender_id,
+          const ProposalID &proposal_id);
   virtual ~Message();
   const enum Type m_type;
   const NodeID m_sender_id;
