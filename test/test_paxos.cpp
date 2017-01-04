@@ -11,14 +11,14 @@ public:
 };
 
 TEST_F(PaxosTest, ProposerRequestPermission) {
-  Proposer p("foo", 2);
+  Proposer p("foo", 2, "value");
   const auto msg = p.request_permission();
   ASSERT_EQ(msg.m_proposal_id.m_node_id, "foo");
   ASSERT_EQ(msg.m_proposal_id.m_proposal_id, 1);
 }
 
 TEST_F(PaxosTest, ProposerNewPermissionRequestNewID) {
-  Proposer p("foo", 2);
+  Proposer p("foo", 2, "value");
   const auto first_msg = p.request_permission();
   const auto second_msg = p.request_permission();
   ASSERT_EQ(first_msg.m_proposal_id.m_proposal_id, 1);
@@ -26,11 +26,11 @@ TEST_F(PaxosTest, ProposerNewPermissionRequestNewID) {
 }
 
 TEST_F(PaxosTest, ProposerCantBeCreatedWithQuorumBelow2) {
-  ASSERT_THROW(Proposer("foo", 1), QuorumTooSmallException);
+  ASSERT_THROW(Proposer("foo", 1, "value"), QuorumTooSmallException);
 }
 
 TEST_F(PaxosTest, ReceiveLessThanQuorumRejectedMessagesAfterProposal) {
-  Proposer p("foo", 2);
+  Proposer p("foo", 2, "value");
   const auto permission_msg = p.request_permission();
   const Message::NoAck noack("bar", permission_msg.m_proposal_id,
                              ProposalID("baz", 2));
@@ -39,7 +39,7 @@ TEST_F(PaxosTest, ReceiveLessThanQuorumRejectedMessagesAfterProposal) {
 }
 
 TEST_F(PaxosTest, IfQuorumRejectedProposalShouldSendNew) {
-  Proposer p("foo", 2);
+  Proposer p("foo", 2, "value");
   const auto permission_msg = p.request_permission();
   const ProposalID accepted_proposal("baz", 3);
   const Message::NoAck noack1("bar", permission_msg.m_proposal_id,
@@ -55,7 +55,7 @@ TEST_F(PaxosTest, IfQuorumRejectedProposalShouldSendNew) {
 }
 
 TEST_F(PaxosTest, IgnoreQuorumRejectingSomeoneElseProposal) {
-  Proposer p("foo", 2);
+  Proposer p("foo", 2, "value");
   const auto permission_msg = p.request_permission();
   const ProposalID accepted_proposal("baz", 3);
   const ProposalID rejected_proposal("bar", 4);
@@ -67,7 +67,7 @@ TEST_F(PaxosTest, IgnoreQuorumRejectingSomeoneElseProposal) {
 }
 
 TEST_F(PaxosTest, CheckNoAcksForHighestProposalID) {
-  Proposer p("foo", 2);
+  Proposer p("foo", 2, "value");
   p.request_permission();
   const ProposalID accepted_proposal("bar", 4);
   const Message::NoAck noack("bar", ProposalID("baz", 3), accepted_proposal);
@@ -78,7 +78,7 @@ TEST_F(PaxosTest, CheckNoAcksForHighestProposalID) {
 }
 
 TEST_F(PaxosTest, DontActOnPromisesUntilQuorumIsReached) {
-  Proposer p("foo", 2);
+  Proposer p("foo", 2, "value");
   const auto prepare_msg = p.request_permission();
   const auto response = p.process_promise(
       Message::PromiseMessage(prepare_msg.m_proposal_id, "bar"));
@@ -86,7 +86,7 @@ TEST_F(PaxosTest, DontActOnPromisesUntilQuorumIsReached) {
 }
 
 TEST_F(PaxosTest, IfEnoughPromisesReceivedAcceptMessageShouldBeSent) {
-  Proposer p("foo", 2);
+  Proposer p("foo", 2, "value");
   const auto prepare_msg = p.request_permission();
   p.process_promise(Message::PromiseMessage(prepare_msg.m_proposal_id, "bar"));
   const auto response = p.process_promise(
@@ -97,7 +97,7 @@ TEST_F(PaxosTest, IfEnoughPromisesReceivedAcceptMessageShouldBeSent) {
 }
 
 TEST_F(PaxosTest, DontActOnPromisesForDifferentProposals) {
-  Proposer p("foo", 2);
+  Proposer p("foo", 2, "value");
   const auto prepare_msg = p.request_permission();
   p.process_promise(Message::PromiseMessage(prepare_msg.m_proposal_id, "bar"));
   const auto response = p.process_promise(Message::PromiseMessage(
@@ -106,7 +106,7 @@ TEST_F(PaxosTest, DontActOnPromisesForDifferentProposals) {
 }
 
 TEST_F(PaxosTest, CheckPromisesForHigherProposalID) {
-  Proposer p("foo", 2);
+  Proposer p("foo", 2, "value");
   const auto prepare_msg = p.request_permission();
   p.process_promise(Message::PromiseMessage(
       ProposalID("foo", prepare_msg.m_proposal_id.m_proposal_id + 1), "baz"));

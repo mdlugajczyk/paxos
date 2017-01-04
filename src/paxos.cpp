@@ -37,8 +37,9 @@ Proposer::process_promise(const Message::PromiseMessage &promise) {
   return {};
 }
 
-Proposer::Proposer(const std::string &id, const int quorum_size)
-    : m_node_id(id), m_quorum_size(quorum_size),
+Proposer::Proposer(const std::string &id, const int quorum_size,
+                   const std::string &value)
+    : m_node_id(id), m_quorum_size(quorum_size), m_value(value),
       m_highest_proposal(m_node_id, 0), m_current_proposal(m_node_id, 0) {
   if (m_quorum_size < 2) {
     throw QuorumTooSmallException();

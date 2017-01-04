@@ -15,7 +15,7 @@ public:
 
 class Proposer {
 public:
-  Proposer(const std::string &id, const int quorum_size);
+  Proposer(const std::string &id, const int quorum_size, const std::string &value);
   Message::PrepareMessage request_permission();
   std::experimental::optional<Message::PrepareMessage>
     process_noack(const Message::NoAck &noack);
@@ -25,6 +25,7 @@ public:
 private:
   const std::string m_node_id;
   const int m_quorum_size;
+  std::string m_value;
   ProposalID m_highest_proposal;
   ProposalID m_current_proposal;
   std::vector<NodeID> m_noack_senders;
