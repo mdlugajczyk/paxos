@@ -39,6 +39,7 @@ set_target_properties(libgmock PROPERTIES
 include_directories("${source_dir}/googletest/include"
                     "${source_dir}/googlemock/include")
 
+set (CMAKE_CXX_FLAGS "-fsanitize=address")
 ADD_EXECUTABLE(test_paxos test_paxos.cpp)
 ADD_EXECUTABLE(test_message test_message.cpp)
 
