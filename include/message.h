@@ -31,7 +31,8 @@ public:
 
 class PrepareMessage : public Message {
 public:
-  PrepareMessage(const ProposalID &id);
+  PrepareMessage(const ProposalID &id, const std::string &value);
+  const std::string m_value;
 };
 
 class PromiseMessage : public Message {

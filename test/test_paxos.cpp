@@ -15,6 +15,7 @@ TEST_F(PaxosTest, ProposerRequestPermission) {
   const auto msg = p.request_permission();
   ASSERT_EQ(msg.m_proposal_id.m_node_id, "foo");
   ASSERT_EQ(msg.m_proposal_id.m_proposal_id, 1);
+  ASSERT_EQ(msg.m_value, "value");
 }
 
 TEST_F(PaxosTest, ProposerNewPermissionRequestNewID) {
@@ -52,6 +53,7 @@ TEST_F(PaxosTest, IfQuorumRejectedProposalShouldSendNew) {
   ASSERT_EQ(noack_response->m_sender_id, "foo");
   ASSERT_EQ(noack_response->m_proposal_id.m_node_id, "foo");
   ASSERT_EQ(noack_response->m_proposal_id.m_proposal_id, 4);
+  ASSERT_EQ(noack_response->m_value, "value");
 }
 
 TEST_F(PaxosTest, IgnoreQuorumRejectingSomeoneElseProposal) {
@@ -117,7 +119,7 @@ TEST_F(PaxosTest, CheckPromisesForHigherProposalID) {
 
 TEST_F(PaxosTest, AcceptorRespondsWithPromiseToPrepareMessage) {
   Acceptor a("foo");
-  const Message::PrepareMessage prepare_msg(ProposalID("bar", 2));
+  const Message::PrepareMessage prepare_msg(ProposalID("bar", 2), "foo value");
   const auto response = a.process_prepare(prepare_msg);
   ASSERT_EQ(response->m_type, Message::Type::Promise);
   ASSERT_EQ(response->m_proposal_id, prepare_msg.m_proposal_id);
@@ -126,10 +128,11 @@ TEST_F(PaxosTest, AcceptorRespondsWithPromiseToPrepareMessage) {
 
 TEST_F(PaxosTest, AcceptorRejectPrepareMsgsIfPromisedHigherProposalID) {
   Acceptor a("foo");
-  const Message::PrepareMessage prepare_msg(ProposalID("bar", 2));
+  const Message::PrepareMessage prepare_msg(ProposalID("bar", 2), "foo value");
   a.process_prepare(prepare_msg);
   const Message::PrepareMessage snd_prepare_msg(
-      ProposalID("baz", prepare_msg.m_proposal_id.m_proposal_id - 1));
+      ProposalID("baz", prepare_msg.m_proposal_id.m_proposal_id - 1),
+      "bar value");
   const auto response = a.process_prepare(snd_prepare_msg);
   ASSERT_EQ(response->m_type, Message::Type::NoAck);
 }

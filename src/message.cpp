@@ -26,8 +26,8 @@ Paxos::Message::Message::Message(const enum Type type, const NodeID &sender_id,
 
 Paxos::Message::Message::~Message() {}
 
-PrepareMessage::PrepareMessage(const ProposalID &id)
-    : Message(Type::Prepare, id.m_node_id, id) {}
+PrepareMessage::PrepareMessage(const ProposalID &id, const std::string &value)
+    : Message(Type::Prepare, id.m_node_id, id), m_value(value) {}
 
 NoAck::NoAck(const NodeID &sender_id, const ProposalID &rejected_proposal,
              const ProposalID &accepted_proposal)

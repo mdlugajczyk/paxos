@@ -10,7 +10,7 @@ Message::PrepareMessage Proposer::request_permission() {
   const ProposalID id(m_node_id, m_highest_proposal.m_proposal_id + 1);
   m_highest_proposal = id;
   m_current_proposal = id;
-  return Message::PrepareMessage(id);
+  return Message::PrepareMessage(id, m_value);
 }
 
 optional<Message::PrepareMessage>
