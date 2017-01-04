@@ -132,6 +132,16 @@ TEST_F(PaxosTest, ProposerCheckPromisesWithHigherProposalID) {
   ASSERT_EQ(prepare_msg2.m_value, "value2");
 }
 
+TEST_F(PaxosTest, ProposerIgnorsEmptyValueInPromiseMessage) {
+  Proposer p("foo", 2, "value");
+  const auto prepare_msg = p.request_permission();
+  p.process_promise(Message::PromiseMessage(
+      ProposalID("foo", prepare_msg.m_proposal_id.m_proposal_id + 1), "baz",
+      ""));
+  const auto prepare_msg2 = p.request_permission();
+  ASSERT_EQ(prepare_msg2.m_value, "value");
+}
+
 TEST_F(PaxosTest, AcceptorRespondsWithPromiseToPrepareMessage) {
   Acceptor a("foo");
   const Message::PrepareMessage prepare_msg(ProposalID("bar", 2), "foo value");

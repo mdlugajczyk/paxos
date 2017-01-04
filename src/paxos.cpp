@@ -29,7 +29,8 @@ optional<Message::AcceptMessage>
 Proposer::process_promise(const Message::PromiseMessage &promise) {
   if (m_highest_proposal < promise.m_proposal_id) {
     m_highest_proposal = promise.m_proposal_id;
-    m_value = promise.m_value;
+    if (!promise.m_value.empty())
+      m_value = promise.m_value;
   }
   if (promise.m_proposal_id != m_current_proposal)
     return {};
