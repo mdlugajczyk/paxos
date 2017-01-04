@@ -162,6 +162,14 @@ TEST_F(PaxosTest, AcceptorRejectPrepareMsgsIfPromisedHigherProposalID) {
   ASSERT_EQ(response->m_type, Message::Type::NoAck);
 }
 
+TEST_F(PaxosTest, AcceptorSendsEmptyValueInPromiseBeforeAnyMessageIsAccepted) {
+  Acceptor a("foo");
+  const Message::PrepareMessage prepare_msg(ProposalID("bar", 2), "foo");
+  const auto response = a.process_prepare(prepare_msg);
+  const auto promise_msg = dynamic_cast<Message::PromiseMessage &>(*response);
+  ASSERT_EQ(promise_msg.m_value, "");
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
