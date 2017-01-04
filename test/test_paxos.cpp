@@ -83,16 +83,17 @@ TEST_F(PaxosTest, DontActOnPromisesUntilQuorumIsReached) {
   Proposer p("foo", 2, "value");
   const auto prepare_msg = p.request_permission();
   const auto response = p.process_promise(
-      Message::PromiseMessage(prepare_msg.m_proposal_id, "bar"));
+      Message::PromiseMessage(prepare_msg.m_proposal_id, "bar", ""));
   ASSERT_FALSE(response);
 }
 
 TEST_F(PaxosTest, IfEnoughPromisesReceivedAcceptMessageShouldBeSent) {
   Proposer p("foo", 2, "value");
   const auto prepare_msg = p.request_permission();
-  p.process_promise(Message::PromiseMessage(prepare_msg.m_proposal_id, "bar"));
+  p.process_promise(
+      Message::PromiseMessage(prepare_msg.m_proposal_id, "bar", "value"));
   const auto response = p.process_promise(
-      Message::PromiseMessage(prepare_msg.m_proposal_id, "baz"));
+      Message::PromiseMessage(prepare_msg.m_proposal_id, "baz", "value"));
   ASSERT_TRUE(response);
   ASSERT_EQ(response->m_proposal_id, prepare_msg.m_proposal_id);
   ASSERT_EQ(response->m_sender_id, "foo");
@@ -102,9 +103,11 @@ TEST_F(PaxosTest, IfEnoughPromisesReceivedAcceptMessageShouldBeSent) {
 TEST_F(PaxosTest, DontActOnPromisesForDifferentProposals) {
   Proposer p("foo", 2, "value");
   const auto prepare_msg = p.request_permission();
-  p.process_promise(Message::PromiseMessage(prepare_msg.m_proposal_id, "bar"));
+  p.process_promise(
+      Message::PromiseMessage(prepare_msg.m_proposal_id, "bar", "foo"));
   const auto response = p.process_promise(Message::PromiseMessage(
-      ProposalID("foo", prepare_msg.m_proposal_id.m_proposal_id + 1), "baz"));
+      ProposalID("foo", prepare_msg.m_proposal_id.m_proposal_id + 1), "baz",
+      "foo"));
   ASSERT_FALSE(response);
 }
 
@@ -112,10 +115,21 @@ TEST_F(PaxosTest, CheckPromisesForHigherProposalID) {
   Proposer p("foo", 2, "value");
   const auto prepare_msg = p.request_permission();
   p.process_promise(Message::PromiseMessage(
-      ProposalID("foo", prepare_msg.m_proposal_id.m_proposal_id + 1), "baz"));
+      ProposalID("foo", prepare_msg.m_proposal_id.m_proposal_id + 1), "baz",
+      "value"));
   const auto prepare_msg2 = p.request_permission();
   ASSERT_EQ(prepare_msg2.m_proposal_id.m_proposal_id,
             prepare_msg.m_proposal_id.m_proposal_id + 2);
+}
+
+TEST_F(PaxosTest, ProposerCheckPromisesWithHigherProposalID) {
+  Proposer p("foo", 2, "value");
+  const auto prepare_msg = p.request_permission();
+  p.process_promise(Message::PromiseMessage(
+      ProposalID("foo", prepare_msg.m_proposal_id.m_proposal_id + 1), "baz",
+      "value2"));
+  const auto prepare_msg2 = p.request_permission();
+  ASSERT_EQ(prepare_msg2.m_value, "value2");
 }
 
 TEST_F(PaxosTest, AcceptorRespondsWithPromiseToPrepareMessage) {

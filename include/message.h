@@ -38,7 +38,9 @@ public:
 
 class PromiseMessage : public Message {
 public:
-  PromiseMessage(const ProposalID &id, const NodeID &sender_id);
+  PromiseMessage(const ProposalID &id, const NodeID &sender_id,
+                 const std::string &value);
+  const std::string m_value;
 };
 
 class AcceptMessage : public Message {

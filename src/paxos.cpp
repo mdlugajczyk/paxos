@@ -27,8 +27,10 @@ Proposer::process_noack(const Message::NoAck &noack) {
 
 optional<Message::AcceptMessage>
 Proposer::process_promise(const Message::PromiseMessage &promise) {
-  if (m_highest_proposal < promise.m_proposal_id)
+  if (m_highest_proposal < promise.m_proposal_id) {
     m_highest_proposal = promise.m_proposal_id;
+    m_value = promise.m_value;
+  }
   if (promise.m_proposal_id != m_current_proposal)
     return {};
   m_promise_senders.push_back(promise.m_sender_id);
@@ -54,7 +56,7 @@ Acceptor::process_prepare(const Message::PrepareMessage &prepare) {
   if (m_highest_proposal < prepare.m_proposal_id) {
     m_highest_proposal = prepare.m_proposal_id;
     return std::make_unique<Message::PromiseMessage>(prepare.m_proposal_id,
-                                                     m_node_id);
+                                                     m_node_id, "");
   }
 
   return std::make_unique<Message::NoAck>(m_node_id, prepare.m_proposal_id,
