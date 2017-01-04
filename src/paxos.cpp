@@ -33,7 +33,7 @@ Proposer::process_promise(const Message::PromiseMessage &promise) {
     return {};
   m_promise_senders.push_back(promise.m_sender_id);
   if (m_promise_senders.size() >= m_quorum_size)
-    return Message::AcceptMessage(m_current_proposal);
+    return Message::AcceptMessage(m_current_proposal, m_value);
   return {};
 }
 

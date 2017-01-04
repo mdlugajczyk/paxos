@@ -37,5 +37,5 @@ NoAck::NoAck(const NodeID &sender_id, const ProposalID &rejected_proposal,
 PromiseMessage::PromiseMessage(const ProposalID &id, const NodeID &node_id)
     : Message(Type::Promise, node_id, id) {}
 
-AcceptMessage::AcceptMessage(const ProposalID &id)
-    : Message(Type::Accept, id.m_node_id, id) {}
+AcceptMessage::AcceptMessage(const ProposalID &id, const std::string &value)
+    : Message(Type::Accept, id.m_node_id, id), m_value(value) {}

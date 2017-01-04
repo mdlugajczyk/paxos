@@ -96,6 +96,7 @@ TEST_F(PaxosTest, IfEnoughPromisesReceivedAcceptMessageShouldBeSent) {
   ASSERT_TRUE(response);
   ASSERT_EQ(response->m_proposal_id, prepare_msg.m_proposal_id);
   ASSERT_EQ(response->m_sender_id, "foo");
+  ASSERT_EQ(response->m_value, "value");
 }
 
 TEST_F(PaxosTest, DontActOnPromisesForDifferentProposals) {

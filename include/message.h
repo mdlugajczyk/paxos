@@ -42,7 +42,8 @@ public:
 
 class AcceptMessage : public Message {
 public:
-  AcceptMessage(const ProposalID &id);
+  AcceptMessage(const ProposalID &id, const std::string &value);
+  const std::string m_value;
 };
 
 class NoAck : public Message {
