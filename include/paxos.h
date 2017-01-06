@@ -36,12 +36,17 @@ private:
 class Acceptor {
 public:
   explicit Acceptor(const std::string &id);
+
   std::unique_ptr<Message::Message>
   process_prepare(const Message::PrepareMessage &msg);
+
+  std::unique_ptr<Message::Message>
+  process_accept(const Message::AcceptMessage &msg);
 
 private:
   const std::string m_node_id;
   ProposalID m_highest_proposal;
+  std::string m_value;
 };
 }
 #endif

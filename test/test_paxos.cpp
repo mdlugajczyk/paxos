@@ -170,6 +170,16 @@ TEST_F(PaxosTest, AcceptorSendsEmptyValueInPromiseBeforeAnyMessageIsAccepted) {
   ASSERT_EQ(promise_msg.m_value, "");
 }
 
+TEST_F(PaxosTest, AcceptorShouldAcceptProposalItJustPromisedToAccept) {
+  Acceptor a("foo");
+  const ProposalID proposal_id("bar", 2);
+  const Message::PrepareMessage prepare_msg(proposal_id, "value");
+  const auto response = a.process_prepare(prepare_msg);
+  const auto accepted =
+      a.process_accept(Message::AcceptMessage(proposal_id, "value"));
+  ASSERT_EQ(accepted->m_type, Message::Type::Accepted);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();

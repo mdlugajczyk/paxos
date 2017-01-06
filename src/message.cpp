@@ -40,3 +40,8 @@ PromiseMessage::PromiseMessage(const ProposalID &id, const NodeID &node_id,
 
 AcceptMessage::AcceptMessage(const ProposalID &id, const std::string &value)
     : Message(Type::Accept, id.m_node_id, id), m_value(value) {}
+
+AcceptedMessage::AcceptedMessage(const ProposalID &id,
+                                 const std::string &sender_id,
+                                 const std::string &value)
+    : Message(Type::Accepted, sender_id, id), m_value(value) {}
