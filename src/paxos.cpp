@@ -69,6 +69,7 @@ Acceptor::process_accept(const Message::AcceptMessage &accept) {
   if (accept.m_proposal_id < m_highest_proposal)
     return std::make_unique<Message::NoAck>(m_node_id, accept.m_proposal_id,
                                             m_highest_proposal);
+  m_highest_proposal = accept.m_proposal_id;
   return std::make_unique<Message::AcceptedMessage>(accept.m_proposal_id,
                                                     m_node_id, m_value);
 }

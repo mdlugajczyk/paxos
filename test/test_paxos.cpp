@@ -190,6 +190,18 @@ TEST_F(PaxosTest, AcceptorShouldntAcceptProposalWithLowerIDThanPromised) {
   ASSERT_EQ(accepted->m_type, Message::Type::NoAck);
 }
 
+TEST_F(PaxosTest, DontAcceptProposalsWithLowerIDThanLastAcceptedProposal) {
+  Acceptor a("foo");
+  const ProposalID proposal_id("bar", 1);
+  const Message::PrepareMessage prepare_msg(proposal_id, "value");
+  const auto response = a.process_prepare(prepare_msg);
+  a.process_accept(Message::AcceptMessage(ProposalID("bar", 3), "value"));
+  ASSERT_EQ(
+      a.process_accept(Message::AcceptMessage(ProposalID("bar", 2), "value"))
+          ->m_type,
+      Message::Type::NoAck);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
