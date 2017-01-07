@@ -180,6 +180,16 @@ TEST_F(PaxosTest, AcceptorShouldAcceptProposalItJustPromisedToAccept) {
   ASSERT_EQ(accepted->m_type, Message::Type::Accepted);
 }
 
+TEST_F(PaxosTest, AcceptorShouldntAcceptProposalWithLowerIDThanPromised) {
+  Acceptor a("foo");
+  const ProposalID proposal_id("bar", 2);
+  const Message::PrepareMessage prepare_msg(proposal_id, "value");
+  const auto response = a.process_prepare(prepare_msg);
+  const auto accepted =
+      a.process_accept(Message::AcceptMessage(ProposalID("bar", 1), "value"));
+  ASSERT_EQ(accepted->m_type, Message::Type::NoAck);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();

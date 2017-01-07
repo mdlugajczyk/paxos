@@ -66,6 +66,9 @@ Acceptor::process_prepare(const Message::PrepareMessage &prepare) {
 
 std::unique_ptr<Message::Message>
 Acceptor::process_accept(const Message::AcceptMessage &accept) {
+  if (accept.m_proposal_id < m_highest_proposal)
+    return std::make_unique<Message::NoAck>(m_node_id, accept.m_proposal_id,
+                                            m_highest_proposal);
   return std::make_unique<Message::AcceptedMessage>(accept.m_proposal_id,
                                                     m_node_id, m_value);
 }
