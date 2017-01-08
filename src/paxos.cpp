@@ -57,7 +57,7 @@ Acceptor::process_prepare(const Message::PrepareMessage &prepare) {
   if (m_highest_proposal < prepare.m_proposal_id) {
     m_highest_proposal = prepare.m_proposal_id;
     return std::make_unique<Message::PromiseMessage>(prepare.m_proposal_id,
-                                                     m_node_id, "");
+                                                     m_node_id, m_value);
   }
 
   return std::make_unique<Message::NoAck>(m_node_id, prepare.m_proposal_id,

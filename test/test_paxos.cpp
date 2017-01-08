@@ -211,6 +211,16 @@ TEST_F(PaxosTest, AcceptedMessageHasTheCorrectValue) {
   ASSERT_EQ(accepted.m_value, "value");
 }
 
+TEST_F(PaxosTest, PromiseShouldIncludeAValueIfAlreadyAccepted) {
+  Acceptor a("foo");
+  const ProposalID proposal_id("bar", 1);
+  a.process_accept(Message::AcceptMessage(ProposalID("bar", 2), "value"));
+  const auto response =
+      a.process_prepare(Message::PrepareMessage(ProposalID("bar", 3), "fnord"));
+  const auto promise_msg = dynamic_cast<Message::PromiseMessage &>(*response);
+  ASSERT_EQ(promise_msg.m_value, "value");
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
