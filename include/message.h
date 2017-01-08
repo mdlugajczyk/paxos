@@ -22,18 +22,17 @@ enum class Type { Prepare, Promise, Accept, Accepted, NoAck };
 
 class Message {
 public:
-  Message(const enum Type type, const NodeID &sender_id,
-          const ProposalID &proposal_id);
+  Message(const enum Type type, const NodeID &sender_id);
   virtual ~Message();
   const enum Type m_type;
   const NodeID m_sender_id;
-  const ProposalID m_proposal_id;
 };
 
 class PrepareMessage : public Message {
 public:
   PrepareMessage(const ProposalID &id, const std::string &value);
   const std::string m_value;
+  const ProposalID m_proposal_id;
 };
 
 class PromiseMessage : public Message {
@@ -41,12 +40,14 @@ public:
   PromiseMessage(const ProposalID &id, const NodeID &sender_id,
                  const std::string &value);
   const std::string m_value;
+  const ProposalID m_proposal_id;
 };
 
 class AcceptMessage : public Message {
 public:
   AcceptMessage(const ProposalID &id, const std::string &value);
   const std::string m_value;
+  const ProposalID m_proposal_id;
 };
 
 class AcceptedMessage : public Message {
@@ -54,12 +55,14 @@ public:
   AcceptedMessage(const ProposalID &id, const std::string &sender_id,
                   const std::string &value);
   const std::string m_value;
+  const ProposalID m_proposal_id;
 };
 
 class NoAck : public Message {
 public:
   NoAck(const NodeID &sender_id, const ProposalID &rejected_proposal,
         const ProposalID &accepted_proposal);
+  const ProposalID m_rejected_proposal;
   const ProposalID m_accepted_proposal;
 };
 }

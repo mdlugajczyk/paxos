@@ -147,8 +147,9 @@ TEST_F(PaxosTest, AcceptorRespondsWithPromiseToPrepareMessage) {
   const Message::PrepareMessage prepare_msg(ProposalID("bar", 2), "foo value");
   const auto response = a.process_prepare(prepare_msg);
   ASSERT_EQ(response->m_type, Message::Type::Promise);
-  ASSERT_EQ(response->m_proposal_id, prepare_msg.m_proposal_id);
-  ASSERT_EQ(response->m_sender_id, "foo");
+  const auto promise_msg = dynamic_cast<Message::PromiseMessage &>(*response);
+  ASSERT_EQ(promise_msg.m_proposal_id, prepare_msg.m_proposal_id);
+  ASSERT_EQ(promise_msg.m_sender_id, "foo");
 }
 
 TEST_F(PaxosTest, AcceptorRejectPrepareMsgsIfPromisedHigherProposalID) {
