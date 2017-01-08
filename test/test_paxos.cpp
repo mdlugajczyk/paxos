@@ -202,6 +202,15 @@ TEST_F(PaxosTest, DontAcceptProposalsWithLowerIDThanLastAcceptedProposal) {
       Message::Type::NoAck);
 }
 
+TEST_F(PaxosTest, AcceptedMessageHasTheCorrectValue) {
+  Acceptor a("foo");
+  const ProposalID proposal_id("bar", 1);
+  const auto response =
+      a.process_accept(Message::AcceptMessage(ProposalID("bar", 3), "value"));
+  const auto accepted = dynamic_cast<Message::AcceptedMessage &>(*response);
+  ASSERT_EQ(accepted.m_value, "value");
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
