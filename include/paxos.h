@@ -48,5 +48,17 @@ private:
   ProposalID m_highest_proposal;
   std::string m_value;
 };
+
+class Learner {
+public:
+  Learner(const std::string &id, const int quorum_size);
+
+  std::experimental::optional<Message::ConsensusReached>
+    process_accepted(const Message::AcceptedMessage &msg);
+private:
+  const std::string m_id;
+  const int m_quorum_size;
+  std::vector<NodeID> m_accepted_proposals;
+};
 }
 #endif

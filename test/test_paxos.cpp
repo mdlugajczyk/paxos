@@ -222,6 +222,27 @@ TEST_F(PaxosTest, PromiseShouldIncludeAValueIfAlreadyAccepted) {
   ASSERT_EQ(promise_msg.m_value, "value");
 }
 
+TEST_F(PaxosTest, LearnerDoesntDeclaresConsensusUntilQuorumAgressOnValue) {
+  Learner learner("foo", 3);
+  const ProposalID proposal_id("bar", 1);
+  const auto response = learner.process_accepted(
+      Message::AcceptedMessage(proposal_id, "bar", "value"));
+  ASSERT_FALSE(response);
+}
+
+TEST_F(PaxosTest, ShouldNoticeWhenQuorumAcceptsProposal) {
+  Learner learner("foo", 3);
+  const ProposalID proposal_id("bar", 1);
+  ASSERT_FALSE(learner.process_accepted(
+      Message::AcceptedMessage(proposal_id, "bar", "value")));
+  ASSERT_FALSE(learner.process_accepted(
+      Message::AcceptedMessage(proposal_id, "foo", "value")));
+  const auto response = learner.process_accepted(
+      Message::AcceptedMessage(proposal_id, "baz", "value"));
+  ASSERT_TRUE(response);
+  ASSERT_EQ(response->m_type, Message::Type::ConsensusReached);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();

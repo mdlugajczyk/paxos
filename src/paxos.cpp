@@ -74,3 +74,15 @@ Acceptor::process_accept(const Message::AcceptMessage &accept) {
   return std::make_unique<Message::AcceptedMessage>(accept.m_proposal_id,
                                                     m_node_id, m_value);
 }
+
+Learner::Learner(const std::string &id, const int quorum_size)
+    : m_id(id), m_quorum_size(quorum_size) {}
+
+std::experimental::optional<Message::ConsensusReached>
+Learner::process_accepted(const Message::AcceptedMessage &msg) {
+  m_accepted_proposals.push_back(msg.m_sender_id);
+  if (m_accepted_proposals.size() >= m_quorum_size) {
+    return Message::ConsensusReached(m_id, msg.m_value);
+  }
+  return {};
+}

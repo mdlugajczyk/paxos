@@ -44,3 +44,7 @@ AcceptedMessage::AcceptedMessage(const ProposalID &id,
                                  const std::string &sender_id,
                                  const std::string &value)
     : Message(Type::Accepted, sender_id), m_value(value), m_proposal_id(id) {}
+
+ConsensusReached::ConsensusReached(const NodeID &sender_id,
+                                   const std::string &value)
+    : Message(Type::ConsensusReached, sender_id), m_value(value) {}
