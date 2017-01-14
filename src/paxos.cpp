@@ -80,8 +80,8 @@ Learner::Learner(const std::string &id, const int quorum_size)
 
 std::experimental::optional<Message::ConsensusReached>
 Learner::process_accepted(const Message::AcceptedMessage &msg) {
-  m_accepted_proposals[msg.m_proposal_id]++;
-  if (m_accepted_proposals[msg.m_proposal_id] >= m_quorum_size) {
+  m_accepted_proposals[msg.m_proposal_id].insert(msg.m_sender_id);
+  if (m_accepted_proposals[msg.m_proposal_id].size() >= m_quorum_size) {
     return Message::ConsensusReached(m_id, msg.m_value);
   }
   return {};

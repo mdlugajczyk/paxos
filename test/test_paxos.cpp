@@ -255,6 +255,17 @@ TEST_F(PaxosTest, LearnerShouldDifferentiateBetweenDifferentProposals) {
       Message::AcceptedMessage(proposal_id2, "foo", "value")));
 }
 
+TEST_F(PaxosTest, HandleDuplicatedMessages) {
+  Learner learner("foo", 3);
+  const ProposalID proposal_id("bar", 1);
+  ASSERT_FALSE(learner.process_accepted(
+      Message::AcceptedMessage(proposal_id, "bar", "value")));
+  ASSERT_FALSE(learner.process_accepted(
+      Message::AcceptedMessage(proposal_id, "foo", "value")));
+  ASSERT_FALSE(learner.process_accepted(
+      Message::AcceptedMessage(proposal_id, "foo", "value")));
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();

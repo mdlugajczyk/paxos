@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 
 namespace Paxos {
 class QuorumTooSmallException : public std::runtime_error {
@@ -59,7 +60,7 @@ public:
 private:
   const std::string m_id;
   const int m_quorum_size;
-  std::map<ProposalID, int> m_accepted_proposals;
+  std::map<ProposalID, std::set<NodeID>> m_accepted_proposals;
 };
 }
 #endif
