@@ -243,6 +243,18 @@ TEST_F(PaxosTest, ShouldNoticeWhenQuorumAcceptsProposal) {
   ASSERT_EQ(response->m_type, Message::Type::ConsensusReached);
 }
 
+TEST_F(PaxosTest, LearnerShouldDifferentiateBetweenDifferentProposals) {
+  Learner learner("foo", 3);
+  const ProposalID proposal_id("bar", 1);
+  const ProposalID proposal_id2("baz", 2);
+  ASSERT_FALSE(learner.process_accepted(
+      Message::AcceptedMessage(proposal_id, "bar", "value")));
+  ASSERT_FALSE(learner.process_accepted(
+      Message::AcceptedMessage(proposal_id, "foo", "value")));
+  ASSERT_FALSE(learner.process_accepted(
+      Message::AcceptedMessage(proposal_id2, "foo", "value")));
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
