@@ -61,6 +61,7 @@ private:
   const std::string m_id;
   const int m_quorum_size;
   std::map<ProposalID, std::set<NodeID>> m_accepted_proposals;
+  std::map<NodeID, ProposalID> m_acceptors;
 };
 }
 #endif
