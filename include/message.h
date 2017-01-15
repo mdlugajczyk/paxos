@@ -12,6 +12,8 @@ struct ProposalID {
   bool operator<(const ProposalID &other) const;
   bool operator==(const ProposalID &other) const;
   bool operator!=(const ProposalID &other) const;
+  std::string serialize() const;
+  static ProposalID deserialize(const std::string &str);
   NodeID m_node_id;
   int m_proposal_id;
 };

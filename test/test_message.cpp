@@ -1,5 +1,6 @@
 #include "message.h"
 #include "gtest/gtest.h"
+#include <sstream>
 
 using namespace Paxos;
 
@@ -39,6 +40,14 @@ TEST_F(MessageTest, CompareIdenticalProposals) {
   const ProposalID p2("a", 2);
   ASSERT_TRUE(p2 == p1);
   ASSERT_FALSE(p2 != p1);
+}
+
+TEST_F(MessageTest, SerializeProposalID) {
+  const ProposalID proposal("foobar", 33);
+  const std::string serialized = proposal.serialize();
+  const ProposalID deserialized = ProposalID::deserialize(serialized);
+  ASSERT_EQ(deserialized.m_node_id, proposal.m_node_id);
+  ASSERT_EQ(deserialized.m_proposal_id, proposal.m_proposal_id);
 }
 
 int main(int argc, char **argv) {
