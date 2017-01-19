@@ -50,6 +50,79 @@ TEST_F(MessageTest, SerializeProposalID) {
   ASSERT_EQ(deserialized.m_proposal_id, proposal.m_proposal_id);
 }
 
+TEST_F(MessageTest, SerializePrepareMessage) {
+  const Message::PrepareMessage msg(ProposalID("foo", 3), "test value 123");
+  const std::string serialized = msg.serialize();
+  const auto deserialized = Message::deserialize(serialized);
+  ASSERT_EQ(msg.m_type, deserialized->m_type);
+  const auto prepare_msg =
+      dynamic_cast<Message::PrepareMessage &>(*deserialized);
+  ASSERT_EQ(msg.m_sender_id, prepare_msg.m_sender_id);
+  ASSERT_EQ(msg.m_value, prepare_msg.m_value);
+  ASSERT_EQ(msg.m_proposal_id, prepare_msg.m_proposal_id);
+}
+
+TEST_F(MessageTest, SerializePromiseMessage) {
+  const Message::PromiseMessage msg(ProposalID("foo", 3), "sender",
+                                    "test value 123");
+  const std::string serialized = msg.serialize();
+  const auto deserialized = Message::deserialize(serialized);
+  ASSERT_EQ(msg.m_type, deserialized->m_type);
+  const auto prepare_msg =
+      dynamic_cast<Message::PromiseMessage &>(*deserialized);
+  ASSERT_EQ(msg.m_sender_id, prepare_msg.m_sender_id);
+  ASSERT_EQ(msg.m_value, prepare_msg.m_value);
+  ASSERT_EQ(msg.m_proposal_id, prepare_msg.m_proposal_id);
+}
+
+TEST_F(MessageTest, SerializeAcceptMessage) {
+  const Message::AcceptMessage msg(ProposalID("foo", 3), "test value 123");
+  const std::string serialized = msg.serialize();
+  const auto deserialized = Message::deserialize(serialized);
+  ASSERT_EQ(msg.m_type, deserialized->m_type);
+  const auto prepare_msg =
+      dynamic_cast<Message::AcceptMessage &>(*deserialized);
+  ASSERT_EQ(msg.m_sender_id, prepare_msg.m_sender_id);
+  ASSERT_EQ(msg.m_value, prepare_msg.m_value);
+  ASSERT_EQ(msg.m_proposal_id, prepare_msg.m_proposal_id);
+}
+
+TEST_F(MessageTest, SerializeAcceptedMessage) {
+  const Message::AcceptedMessage msg(ProposalID("foo", 3), "sender",
+                                     "test value 123");
+  const std::string serialized = msg.serialize();
+  const auto deserialized = Message::deserialize(serialized);
+  ASSERT_EQ(msg.m_type, deserialized->m_type);
+  const auto prepare_msg =
+      dynamic_cast<Message::AcceptedMessage &>(*deserialized);
+  ASSERT_EQ(msg.m_sender_id, prepare_msg.m_sender_id);
+  ASSERT_EQ(msg.m_value, prepare_msg.m_value);
+  ASSERT_EQ(msg.m_proposal_id, prepare_msg.m_proposal_id);
+}
+
+TEST_F(MessageTest, SerializeConsensusReachedMessage) {
+  const Message::ConsensusReached msg("sender", "test value 123");
+  const std::string serialized = msg.serialize();
+  const auto deserialized = Message::deserialize(serialized);
+  ASSERT_EQ(msg.m_type, deserialized->m_type);
+  const auto prepare_msg =
+      dynamic_cast<Message::ConsensusReached &>(*deserialized);
+  ASSERT_EQ(msg.m_sender_id, prepare_msg.m_sender_id);
+  ASSERT_EQ(msg.m_value, prepare_msg.m_value);
+}
+
+TEST_F(MessageTest, SerializeNoAckMessage) {
+  const Message::NoAck msg("sender", ProposalID("foo", 3),
+                           ProposalID("bar", 4));
+  const std::string serialized = msg.serialize();
+  const auto deserialized = Message::deserialize(serialized);
+  ASSERT_EQ(msg.m_type, deserialized->m_type);
+  const auto prepare_msg = dynamic_cast<Message::NoAck &>(*deserialized);
+  ASSERT_EQ(msg.m_sender_id, prepare_msg.m_sender_id);
+  ASSERT_EQ(msg.m_rejected_proposal, prepare_msg.m_rejected_proposal);
+  ASSERT_EQ(msg.m_accepted_proposal, prepare_msg.m_accepted_proposal);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();

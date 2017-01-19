@@ -1,6 +1,7 @@
 #ifndef __MESSAGE_H_
 #define __MESSAGE_H_
 
+#include <memory>
 #include <string>
 
 namespace Paxos {
@@ -19,22 +20,32 @@ struct ProposalID {
 };
 
 namespace Message {
+class Serializer;
 
-  enum class Type { Prepare, Promise, Accept, Accepted, ConsensusReached, NoAck };
+enum class Type { Prepare, Promise, Accept, Accepted, ConsensusReached, NoAck };
 
 class Message {
 public:
   Message(const enum Type type, const NodeID &sender_id);
   virtual ~Message();
+  std::string serialize() const;
   const enum Type m_type;
   const NodeID m_sender_id;
+
+private:
+  virtual void serialize_impl(Serializer &serializer) const = 0;
 };
+
+std::unique_ptr<Message> deserialize(const std::string &serialized_msg);
 
 class PrepareMessage : public Message {
 public:
   PrepareMessage(const ProposalID &id, const std::string &value);
   const std::string m_value;
   const ProposalID m_proposal_id;
+
+private:
+  void serialize_impl(Serializer &serializer) const;
 };
 
 class PromiseMessage : public Message {
@@ -43,6 +54,9 @@ public:
                  const std::string &value);
   const std::string m_value;
   const ProposalID m_proposal_id;
+
+private:
+  void serialize_impl(Serializer &serializer) const;
 };
 
 class AcceptMessage : public Message {
@@ -50,6 +64,9 @@ public:
   AcceptMessage(const ProposalID &id, const std::string &value);
   const std::string m_value;
   const ProposalID m_proposal_id;
+
+private:
+  void serialize_impl(Serializer &serializer) const;
 };
 
 class AcceptedMessage : public Message {
@@ -58,12 +75,18 @@ public:
                   const std::string &value);
   const std::string m_value;
   const ProposalID m_proposal_id;
+
+private:
+  void serialize_impl(Serializer &serializer) const;
 };
 
 class ConsensusReached : public Message {
 public:
   ConsensusReached(const NodeID &sender_id, const std::string &value);
   const std::string m_value;
+
+private:
+  void serialize_impl(Serializer &serializer) const;
 };
 
 class NoAck : public Message {
@@ -72,6 +95,9 @@ public:
         const ProposalID &accepted_proposal);
   const ProposalID m_rejected_proposal;
   const ProposalID m_accepted_proposal;
+
+private:
+  void serialize_impl(Serializer &serializer) const;
 };
 }
 }
