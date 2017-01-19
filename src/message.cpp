@@ -165,38 +165,34 @@ Paxos::Message::deserialize(const std::string &serialized_message) {
   Deserializer d(serialized_message);
   const Type type = static_cast<Type>(d.deserialize<int>());
   const std::string sender_id = d.deserialize<std::string>();
-  switch (type) {
-  case Type::Prepare: {
-    const std::string value = d.deserialize<std::string>();
-    ProposalID proposal = d.deserialize<ProposalID>();
-    return std::make_unique<Paxos::Message::PrepareMessage>(proposal, value);
-  }
-  case Type::Promise: {
-    const std::string value = d.deserialize<std::string>();
-    ProposalID proposal = d.deserialize<ProposalID>();
-    return std::make_unique<Paxos::Message::PromiseMessage>(proposal, sender_id,
-                                                            value);
-  }
-  case Type::Accept: {
-    const std::string value = d.deserialize<std::string>();
-    ProposalID proposal = d.deserialize<ProposalID>();
-    return std::make_unique<Paxos::Message::AcceptMessage>(proposal, value);
-  }
-  case Type::Accepted: {
-    const std::string value = d.deserialize<std::string>();
-    ProposalID proposal = d.deserialize<ProposalID>();
-    return std::make_unique<Paxos::Message::AcceptedMessage>(proposal,
-                                                             sender_id, value);
-  }
-  case Type::ConsensusReached: {
-    const std::string value = d.deserialize<std::string>();
-    return std::make_unique<Paxos::Message::ConsensusReached>(sender_id, value);
-  }
-  case Type::NoAck: {
+
+  if (type == Type::NoAck) {
     ProposalID rejected_proposal = d.deserialize<ProposalID>();
     ProposalID accepted_proposal = d.deserialize<ProposalID>();
     return std::make_unique<Paxos::Message::NoAck>(sender_id, rejected_proposal,
                                                    accepted_proposal);
   }
+
+  const std::string value = d.deserialize<std::string>();
+
+  if (type == Type::ConsensusReached) {
+    return std::make_unique<Paxos::Message::ConsensusReached>(sender_id, value);
+  }
+
+  const ProposalID proposal = d.deserialize<ProposalID>();
+  switch (type) {
+  case Type::Prepare:
+    return std::make_unique<Paxos::Message::PrepareMessage>(proposal, value);
+  case Type::Promise:
+    return std::make_unique<Paxos::Message::PromiseMessage>(proposal, sender_id,
+                                                            value);
+  case Type::Accept:
+    return std::make_unique<Paxos::Message::AcceptMessage>(proposal, value);
+  case Type::Accepted:
+    return std::make_unique<Paxos::Message::AcceptedMessage>(proposal,
+                                                             sender_id, value);
+  case Type::NoAck:
+  case Type::ConsensusReached:
+    return {}; // Won't get there
   }
 }
