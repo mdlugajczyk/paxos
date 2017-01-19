@@ -23,7 +23,7 @@ bool ProposalID::operator!=(const Paxos::ProposalID &other) const {
   return !operator==(other);
 }
 
-class Serializer {
+class Paxos::Message::Serializer {
 public:
   std::string str() const { return std::string(&m_data[0], m_data.size()); };
   void serialize(int val) {
@@ -49,29 +49,31 @@ public:
   Deserializer(const std::string &serialized_value)
       : m_index(0), m_data(serialized_value) {}
 
-  int deserialize_int() {
-    if (m_index + sizeof(int) > m_data.size())
-      throw std::runtime_error("Failed to deserialize int.");
-    int val;
-    memcpy(&val, m_data.c_str() + m_index, sizeof(val));
-    m_index += sizeof(val);
-    return val;
-  }
-
-  std::string deserialize_str() {
-    const int length = deserialize_int();
-    if (m_index + length > m_data.size())
-      throw std::runtime_error("Failed to deserialize string.");
-    char buff[length];
-    memcpy(buff, m_data.c_str() + m_index, length);
-    m_index += length;
-    return std::string(buff, length);
-  }
+  template <typename T> T deserialize();
 
 private:
   int m_index;
   const std::string m_data;
 };
+
+template <> int Deserializer::deserialize() {
+  if (m_index + sizeof(int) > m_data.size())
+    throw std::runtime_error("Failed to deserialize int.");
+  int val;
+  memcpy(&val, m_data.c_str() + m_index, sizeof(val));
+  m_index += sizeof(val);
+  return val;
+}
+
+template <> std::string Deserializer::deserialize() {
+  const int length = deserialize<int>();
+  if (m_index + length > m_data.size())
+    throw std::runtime_error("Failed to deserialize string.");
+  char buff[length];
+  memcpy(buff, m_data.c_str() + m_index, length);
+  m_index += length;
+  return std::string(buff, length);
+}
 
 std::string ProposalID::serialize() const {
   Serializer s;
@@ -82,8 +84,8 @@ std::string ProposalID::serialize() const {
 
 ProposalID ProposalID::deserialize(const std::string &serialized) {
   Deserializer d(serialized);
-  const int proposal_id = d.deserialize_int();
-  const std::string node_id = d.deserialize_str();
+  const int proposal_id = d.deserialize<int>();
+  const std::string node_id = d.deserialize<std::string>();
   return ProposalID(node_id, proposal_id);
 }
 
