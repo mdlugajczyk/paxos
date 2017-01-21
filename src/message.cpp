@@ -8,6 +8,8 @@ using namespace Paxos::Persistence;
 ProposalID::ProposalID(const NodeID &node_id, const int proposal_id)
     : m_node_id(node_id), m_proposal_id(proposal_id) {}
 
+ProposalID::ProposalID() : m_node_id(""), m_proposal_id(0) {}
+
 bool ProposalID::operator<(const Paxos::ProposalID &other) const {
   if (m_proposal_id == other.m_proposal_id)
     return m_node_id < other.m_node_id;

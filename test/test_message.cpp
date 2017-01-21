@@ -42,6 +42,12 @@ TEST_F(MessageTest, CompareIdenticalProposals) {
   ASSERT_FALSE(p2 != p1);
 }
 
+TEST_F(MessageTest, DefaultProposal) {
+  ProposalID p;
+  ASSERT_EQ(p.m_node_id, "");
+  ASSERT_EQ(p.m_proposal_id, 0);
+}
+
 TEST_F(MessageTest, SerializeProposalID) {
   const ProposalID proposal("foobar", 33);
   const std::string serialized = proposal.serialize();

@@ -9,6 +9,7 @@ namespace Paxos {
 typedef std::string NodeID;
 
 struct ProposalID {
+  ProposalID();
   ProposalID(const NodeID &node_id, const int proposal_id);
   bool operator<(const ProposalID &other) const;
   bool operator==(const ProposalID &other) const;
