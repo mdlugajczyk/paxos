@@ -42,6 +42,7 @@ include_directories("${source_dir}/googletest/include"
 set (CMAKE_CXX_FLAGS "-fsanitize=address")
 ADD_EXECUTABLE(test_paxos test_paxos.cpp)
 ADD_EXECUTABLE(test_message test_message.cpp)
+ADD_EXECUTABLE(test_state_persister test_state_persister.cpp)
 
 TARGET_LINK_LIBRARIES(test_paxos
     libpaxos
@@ -55,8 +56,17 @@ TARGET_LINK_LIBRARIES(test_message
     libgmock
 )
 
+TARGET_LINK_LIBRARIES(test_state_persister
+    libpaxos
+    libgtest
+    libgmock
+)
+
 add_test(NAME test_paxos
   COMMAND test_paxos)
 
 add_test(NAME test_message
   COMMAND test_message)
+
+add_test(NAME test_state_persister
+  COMMAND test_state_persister)
