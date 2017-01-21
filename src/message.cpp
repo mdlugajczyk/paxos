@@ -1,10 +1,9 @@
 #include "message.h"
-#include <cstring>
-#include <stdexcept>
-#include <vector>
+#include "persistence.h"
 
 using namespace Paxos;
 using namespace Paxos::Message;
+using namespace Paxos::Persistence;
 
 ProposalID::ProposalID(const NodeID &node_id, const int proposal_id)
     : m_node_id(node_id), m_proposal_id(proposal_id) {}
@@ -23,63 +22,6 @@ bool ProposalID::operator!=(const Paxos::ProposalID &other) const {
   return !operator==(other);
 }
 
-class Paxos::Message::Serializer {
-public:
-  std::string str() const { return std::string(&m_data[0], m_data.size()); };
-  void serialize(int val) {
-    serialize(reinterpret_cast<const char *>(&val), sizeof(val));
-  }
-
-  void serialize(const std::string &str) {
-    serialize(str.size());
-    serialize(str.c_str(), str.size());
-  }
-
-private:
-  void serialize(const char *const val, int val_size) {
-    const int current_size = m_data.size();
-    m_data.resize(current_size + val_size);
-    memcpy(&m_data[current_size], val, val_size);
-  }
-  std::vector<char> m_data;
-};
-
-class Deserializer {
-public:
-  Deserializer(const std::string &serialized_value)
-      : m_index(0), m_data(serialized_value) {}
-
-  template <typename T> T deserialize();
-
-private:
-  int m_index;
-  const std::string m_data;
-};
-
-template <> int Deserializer::deserialize() {
-  if (m_index + sizeof(int) > m_data.size())
-    throw std::runtime_error("Failed to deserialize int.");
-  int val;
-  memcpy(&val, m_data.c_str() + m_index, sizeof(val));
-  m_index += sizeof(val);
-  return val;
-}
-
-template <> std::string Deserializer::deserialize() {
-  const int length = deserialize<int>();
-  if (m_index + length > m_data.size())
-    throw std::runtime_error("Failed to deserialize string.");
-  char buff[length];
-  memcpy(buff, m_data.c_str() + m_index, length);
-  m_index += length;
-  return std::string(buff, length);
-}
-
-template <> ProposalID Deserializer::deserialize() {
-  const auto str = deserialize<std::string>();
-  return ProposalID::deserialize(str);
-}
-
 std::string ProposalID::serialize() const {
   Serializer s;
   s.serialize(m_proposal_id);
@@ -92,6 +34,11 @@ ProposalID ProposalID::deserialize(const std::string &serialized) {
   const int proposal_id = d.deserialize<int>();
   const std::string node_id = d.deserialize<std::string>();
   return ProposalID(node_id, proposal_id);
+}
+
+template <> ProposalID Deserializer::deserialize() {
+  const auto str = deserialize<std::string>();
+  return ProposalID::deserialize(str);
 }
 
 Paxos::Message::Message::Message(const enum Type type, const NodeID &sender_id)
