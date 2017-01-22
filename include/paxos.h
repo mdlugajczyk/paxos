@@ -48,6 +48,7 @@ public:
   process_accept(const Message::AcceptMessage &msg);
 
 private:
+  std::shared_ptr<StatePersister> m_state_persister;
   const std::string m_node_id;
   ProposalID m_highest_proposal;
   std::string m_value;

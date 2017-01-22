@@ -9,6 +9,8 @@ public:
   virtual void persist(const Paxos::State &state);
   virtual Paxos::State restore();
   Paxos::State m_state;
+  int m_persist_calls;
+  int m_restore_calls;
 };
 
 #endif

@@ -290,6 +290,24 @@ TEST_F(PaxosTest,
       Message::AcceptedMessage(proposal_id, "fnord", "value")));
 }
 
+TEST_F(PaxosTest, AcceptorRestoresPreviousState) {
+  std::shared_ptr<FakeStatePersister> sp = std::make_shared<FakeStatePersister>(
+      Paxos::State("value", ProposalID("a node", 3)));
+  Acceptor a("foo", sp);
+  ASSERT_EQ(sp->m_restore_calls, 1);
+  const auto response =
+      a.process_prepare(Message::PrepareMessage(ProposalID("bar", 1), "fnord"));
+  ASSERT_EQ(response->m_type, Message::Type::NoAck);
+  const auto noack = dynamic_cast<Message::NoAck &>(*response);
+  ASSERT_EQ(noack.m_accepted_proposal, sp->m_state.m_proposal);
+
+  const auto response2 =
+      a.process_prepare(Message::PrepareMessage(ProposalID("bar", 4), "fnord"));
+  ASSERT_EQ(response2->m_type, Message::Type::Promise);
+  const auto promise = dynamic_cast<Message::PromiseMessage &>(*response2);
+  ASSERT_EQ(promise.m_value, sp->m_state.m_value);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();

@@ -1,4 +1,5 @@
 #include "paxos.h"
+#include "state_persister.h"
 
 using namespace Paxos;
 using namespace std::experimental;
@@ -51,7 +52,12 @@ Proposer::Proposer(const std::string &id, const int quorum_size,
 
 Acceptor::Acceptor(const std::string &id,
                    std::shared_ptr<StatePersister> persister)
-    : m_node_id(id), m_highest_proposal(m_node_id, 0) {}
+    : m_state_persister(persister), m_node_id(id),
+      m_highest_proposal(m_node_id, 0) {
+  const State s = m_state_persister->restore();
+  m_highest_proposal = s.m_proposal;
+  m_value = s.m_value;
+}
 
 std::unique_ptr<Message::Message>
 Acceptor::process_prepare(const Message::PrepareMessage &prepare) {
@@ -83,7 +89,8 @@ std::experimental::optional<Message::ConsensusReached>
 Learner::process_accepted(const Message::AcceptedMessage &msg) {
   const auto previous_proposal = m_acceptors.find(msg.m_sender_id);
   if (previous_proposal != m_acceptors.end())
-    m_accepted_proposals[previous_proposal->second].erase(previous_proposal->first);
+    m_accepted_proposals[previous_proposal->second].erase(
+        previous_proposal->first);
 
   m_accepted_proposals[msg.m_proposal_id].insert(msg.m_sender_id);
   m_acceptors.insert(std::make_pair(msg.m_sender_id, msg.m_proposal_id));
