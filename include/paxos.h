@@ -35,9 +35,11 @@ private:
   std::vector<NodeID> m_promise_senders;
 };
 
+class StatePersister;
+
 class Acceptor {
 public:
-  explicit Acceptor(const std::string &id);
+  Acceptor(const std::string &id, std::shared_ptr<StatePersister> persister);
 
   std::unique_ptr<Message::Message>
   process_prepare(const Message::PrepareMessage &msg);

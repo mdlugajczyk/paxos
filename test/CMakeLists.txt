@@ -37,7 +37,17 @@ set_target_properties(libgmock PROPERTIES
 
 # I couldn't make it work with INTERFACE_INCLUDE_DIRECTORIES
 include_directories("${source_dir}/googletest/include"
-                    "${source_dir}/googlemock/include")
+  "${source_dir}/googlemock/include"
+  "include")
+
+file(GLOB TEST_SRCS src/*.cpp)
+add_library(libtest_fakes SHARED
+    ${TEST_SRCS}
+)
+
+TARGET_LINK_LIBRARIES(libtest_fakes
+    libpaxos
+)
 
 set (CMAKE_CXX_FLAGS "-fsanitize=address")
 ADD_EXECUTABLE(test_paxos test_paxos.cpp)
@@ -48,18 +58,21 @@ TARGET_LINK_LIBRARIES(test_paxos
     libpaxos
     libgtest
     libgmock
+    libtest_fakes
 )
 
 TARGET_LINK_LIBRARIES(test_message
     libpaxos
     libgtest
     libgmock
+    libtest_fakes
 )
 
 TARGET_LINK_LIBRARIES(test_state_persister
     libpaxos
     libgtest
     libgmock
+    libtest_fakes
 )
 
 add_test(NAME test_paxos

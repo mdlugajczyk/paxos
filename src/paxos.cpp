@@ -49,7 +49,8 @@ Proposer::Proposer(const std::string &id, const int quorum_size,
   }
 }
 
-Acceptor::Acceptor(const std::string &id)
+Acceptor::Acceptor(const std::string &id,
+                   std::shared_ptr<StatePersister> persister)
     : m_node_id(id), m_highest_proposal(m_node_id, 0) {}
 
 std::unique_ptr<Message::Message>

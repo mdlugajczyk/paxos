@@ -1,3 +1,4 @@
+#include "fake_state_persister.h"
 #include "paxos.h"
 #include "gtest/gtest.h"
 #include <cstdint>
@@ -143,7 +144,8 @@ TEST_F(PaxosTest, ProposerIgnorsEmptyValueInPromiseMessage) {
 }
 
 TEST_F(PaxosTest, AcceptorRespondsWithPromiseToPrepareMessage) {
-  Acceptor a("foo");
+  Acceptor a("foo", std::make_shared<FakeStatePersister>(
+                        Paxos::State("", ProposalID())));
   const Message::PrepareMessage prepare_msg(ProposalID("bar", 2), "foo value");
   const auto response = a.process_prepare(prepare_msg);
   ASSERT_EQ(response->m_type, Message::Type::Promise);
@@ -153,7 +155,8 @@ TEST_F(PaxosTest, AcceptorRespondsWithPromiseToPrepareMessage) {
 }
 
 TEST_F(PaxosTest, AcceptorRejectPrepareMsgsIfPromisedHigherProposalID) {
-  Acceptor a("foo");
+  Acceptor a("foo", std::make_shared<FakeStatePersister>(
+                        Paxos::State("", ProposalID())));
   const Message::PrepareMessage prepare_msg(ProposalID("bar", 2), "foo value");
   a.process_prepare(prepare_msg);
   const Message::PrepareMessage snd_prepare_msg(
@@ -164,7 +167,8 @@ TEST_F(PaxosTest, AcceptorRejectPrepareMsgsIfPromisedHigherProposalID) {
 }
 
 TEST_F(PaxosTest, AcceptorSendsEmptyValueInPromiseBeforeAnyMessageIsAccepted) {
-  Acceptor a("foo");
+  Acceptor a("foo", std::make_shared<FakeStatePersister>(
+                        Paxos::State("", ProposalID())));
   const Message::PrepareMessage prepare_msg(ProposalID("bar", 2), "foo");
   const auto response = a.process_prepare(prepare_msg);
   const auto promise_msg = dynamic_cast<Message::PromiseMessage &>(*response);
@@ -172,7 +176,8 @@ TEST_F(PaxosTest, AcceptorSendsEmptyValueInPromiseBeforeAnyMessageIsAccepted) {
 }
 
 TEST_F(PaxosTest, AcceptorShouldAcceptProposalItJustPromisedToAccept) {
-  Acceptor a("foo");
+  Acceptor a("foo", std::make_shared<FakeStatePersister>(
+                        Paxos::State("", ProposalID())));
   const ProposalID proposal_id("bar", 2);
   const Message::PrepareMessage prepare_msg(proposal_id, "value");
   const auto response = a.process_prepare(prepare_msg);
@@ -182,7 +187,8 @@ TEST_F(PaxosTest, AcceptorShouldAcceptProposalItJustPromisedToAccept) {
 }
 
 TEST_F(PaxosTest, AcceptorShouldntAcceptProposalWithLowerIDThanPromised) {
-  Acceptor a("foo");
+  Acceptor a("foo", std::make_shared<FakeStatePersister>(
+                        Paxos::State("", ProposalID())));
   const ProposalID proposal_id("bar", 2);
   const Message::PrepareMessage prepare_msg(proposal_id, "value");
   const auto response = a.process_prepare(prepare_msg);
@@ -192,7 +198,8 @@ TEST_F(PaxosTest, AcceptorShouldntAcceptProposalWithLowerIDThanPromised) {
 }
 
 TEST_F(PaxosTest, DontAcceptProposalsWithLowerIDThanLastAcceptedProposal) {
-  Acceptor a("foo");
+  Acceptor a("foo", std::make_shared<FakeStatePersister>(
+                        Paxos::State("", ProposalID())));
   const ProposalID proposal_id("bar", 1);
   const Message::PrepareMessage prepare_msg(proposal_id, "value");
   const auto response = a.process_prepare(prepare_msg);
@@ -204,7 +211,8 @@ TEST_F(PaxosTest, DontAcceptProposalsWithLowerIDThanLastAcceptedProposal) {
 }
 
 TEST_F(PaxosTest, AcceptedMessageHasTheCorrectValue) {
-  Acceptor a("foo");
+  Acceptor a("foo", std::make_shared<FakeStatePersister>(
+                        Paxos::State("", ProposalID())));
   const ProposalID proposal_id("bar", 1);
   const auto response =
       a.process_accept(Message::AcceptMessage(ProposalID("bar", 3), "value"));
@@ -213,7 +221,8 @@ TEST_F(PaxosTest, AcceptedMessageHasTheCorrectValue) {
 }
 
 TEST_F(PaxosTest, PromiseShouldIncludeAValueIfAlreadyAccepted) {
-  Acceptor a("foo");
+  Acceptor a("foo", std::make_shared<FakeStatePersister>(
+                        Paxos::State("", ProposalID())));
   const ProposalID proposal_id("bar", 1);
   a.process_accept(Message::AcceptMessage(ProposalID("bar", 2), "value"));
   const auto response =

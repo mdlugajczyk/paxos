@@ -7,16 +7,16 @@
 namespace Paxos {
   struct State {
     State(const std::string &value, const ProposalID &proposal);
-    const std::string m_value;
-    const ProposalID m_proposal;
+    std::string m_value;
+    ProposalID m_proposal;
   };
 
   class StatePersister {
   public:
     StatePersister(const std::string &file);
     virtual ~StatePersister();
-    void persist(const State &state);
-    State restore();
+    virtual void persist(const State &state);
+    virtual State restore();
   private:
     const std::string m_filename;
   };
