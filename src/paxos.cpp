@@ -63,6 +63,7 @@ std::unique_ptr<Message::Message>
 Acceptor::process_prepare(const Message::PrepareMessage &prepare) {
   if (m_highest_proposal < prepare.m_proposal_id) {
     m_highest_proposal = prepare.m_proposal_id;
+    m_state_persister->persist(State(m_value, m_highest_proposal));
     return std::make_unique<Message::PromiseMessage>(prepare.m_proposal_id,
                                                      m_node_id, m_value);
   }

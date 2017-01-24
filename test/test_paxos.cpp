@@ -308,6 +308,18 @@ TEST_F(PaxosTest, AcceptorRestoresPreviousState) {
   ASSERT_EQ(promise.m_value, sp->m_state.m_value);
 }
 
+TEST_F(PaxosTest, AcceptorSavesStatBeforeSendingPromise) {
+  std::shared_ptr<FakeStatePersister> sp =
+      std::make_shared<FakeStatePersister>(Paxos::State("", ProposalID()));
+  Acceptor a("foo", sp);
+  const ProposalID proposal("bar", 1);
+  const auto response =
+      a.process_prepare(Message::PrepareMessage(proposal, "fnord"));
+  ASSERT_EQ(response->m_type, Message::Type::Promise);
+  ASSERT_EQ(sp->m_persist_calls, 1);
+  ASSERT_EQ(sp->m_state.m_proposal, proposal);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
