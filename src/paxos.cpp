@@ -79,6 +79,7 @@ Acceptor::process_accept(const Message::AcceptMessage &accept) {
                                             m_highest_proposal);
   m_highest_proposal = accept.m_proposal_id;
   m_value = accept.m_value;
+  m_state_persister->persist(State(m_value, m_highest_proposal));
   return std::make_unique<Message::AcceptedMessage>(accept.m_proposal_id,
                                                     m_node_id, m_value);
 }
