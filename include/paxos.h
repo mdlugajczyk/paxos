@@ -2,12 +2,11 @@
 #define __PAXOS_H__
 
 #include "message.h"
-#include <experimental/optional>
+#include <map>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <map>
-#include <set>
 
 namespace Paxos {
 class QuorumTooSmallException : public std::runtime_error {
@@ -19,10 +18,10 @@ class Proposer {
 public:
   Proposer(const std::string &id, const int quorum_size,
            const std::string &value);
-  Message::PrepareMessage request_permission();
-  std::experimental::optional<Message::PrepareMessage>
+  std::shared_ptr<Message::PrepareMessage> request_permission();
+  std::shared_ptr<Message::PrepareMessage>
   process_noack(const Message::NoAck &noack);
-  std::experimental::optional<Message::AcceptMessage>
+  std::shared_ptr<Message::AcceptMessage>
   process_promise(const Message::PromiseMessage &noack);
 
 private:
@@ -41,10 +40,10 @@ class Acceptor {
 public:
   Acceptor(const std::string &id, std::shared_ptr<StatePersister> persister);
 
-  std::unique_ptr<Message::Message>
+  std::shared_ptr<Message::Message>
   process_prepare(const Message::PrepareMessage &msg);
 
-  std::unique_ptr<Message::Message>
+  std::shared_ptr<Message::Message>
   process_accept(const Message::AcceptMessage &msg);
 
 private:
@@ -58,8 +57,9 @@ class Learner {
 public:
   Learner(const std::string &id, const int quorum_size);
 
-  std::experimental::optional<Message::ConsensusReached>
-    process_accepted(const Message::AcceptedMessage &msg);
+  std::shared_ptr<Message::ConsensusReached>
+  process_accepted(const Message::AcceptedMessage &msg);
+
 private:
   const std::string m_id;
   const int m_quorum_size;
