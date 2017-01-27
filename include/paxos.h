@@ -16,9 +16,9 @@ public:
 
 class Proposer {
 public:
-  Proposer(const std::string &id, const int quorum_size,
-           const std::string &value);
-  std::shared_ptr<Message::PrepareMessage> request_permission();
+  Proposer(const std::string &id, const int quorum_size);
+  std::shared_ptr<Message::PrepareMessage>
+  request_permission(const std::string &value);
   std::shared_ptr<Message::PrepareMessage>
   process_noack(const Message::NoAck &noack);
   std::shared_ptr<Message::AcceptMessage>
