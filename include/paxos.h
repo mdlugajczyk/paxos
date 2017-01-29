@@ -66,5 +66,18 @@ private:
   std::map<ProposalID, std::set<NodeID>> m_accepted_proposals;
   std::map<NodeID, ProposalID> m_acceptors;
 };
+
+class Node {
+public:
+  Node(int quorum_size, const std::string &node_name,
+       const std::string &data_directory);
+  std::shared_ptr<Message::Message>
+  process_message(std::shared_ptr<Message::Message> msg);
+
+private:
+  Proposer m_proposer;
+  Acceptor m_acceptor;
+  Learner m_learner;
+};
 }
 #endif

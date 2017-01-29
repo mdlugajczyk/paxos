@@ -1,5 +1,6 @@
 #include "paxos.h"
 #include "state_persister.h"
+#include <iostream>
 
 using namespace Paxos;
 
@@ -101,6 +102,62 @@ Learner::process_accepted(const Message::AcceptedMessage &msg) {
 
   if (m_accepted_proposals[msg.m_proposal_id].size() >= m_quorum_size) {
     return std::make_shared<Message::ConsensusReached>(m_id, msg.m_value);
+  }
+  return {};
+}
+
+static std::string
+get_path_to_node_state_file(const std::string &data_directory,
+                            const std::string &node_name) {
+  return data_directory + "/" + node_name;
+}
+
+Node::Node(int quorum_size, const std::string &node_name,
+           const std::string &data_directory)
+    : m_proposer(node_name, quorum_size),
+      m_acceptor(node_name,
+                 std::make_shared<StatePersister>(
+                     get_path_to_node_state_file(data_directory, node_name))),
+      m_learner(node_name, quorum_size) {}
+
+static void notify_if_consensus_reached(std::shared_ptr<Message::Message> msg) {
+  if (!msg)
+    return;
+  auto const consensus_reached =
+      dynamic_cast<Message::ConsensusReached &>(*msg.get());
+  std::cout << "Consensus reached. Value: " << consensus_reached.m_value
+            << " sender " << consensus_reached.m_sender_id << std::endl;
+}
+
+std::shared_ptr<Message::Message>
+Node::process_message(std::shared_ptr<Message::Message> msg) {
+  // This switch statement isn't particulary nice, but I think it's better
+  // then the alternative. To avoid it, something equivalent to a double
+  // dispatch mechanism would be required, and that brings quite a lot of
+  // complexity. I don't think that's justified, particularly as the Type enum
+  // is not going to change.
+  switch (msg->m_type) {
+  case Message::Type::Prepare:
+    return m_acceptor.process_prepare(
+        dynamic_cast<Message::PrepareMessage &>(*msg.get()));
+  case Message::Type::Promise:
+    return m_proposer.process_promise(
+        dynamic_cast<Message::PromiseMessage &>(*msg.get()));
+  case Message::Type::Accept: {
+    const auto response = m_acceptor.process_accept(
+        dynamic_cast<Message::AcceptMessage &>(*msg.get()));
+    if (response->m_type == Message::Type::Accepted)
+      notify_if_consensus_reached(m_learner.process_accepted(
+          dynamic_cast<Message::AcceptedMessage &>(*response.get())));
+    return response;
+  }
+  case Message::Type::Accepted:
+    return m_learner.process_accepted(
+        dynamic_cast<Message::AcceptedMessage &>(*msg.get()));
+  case Message::Type::NoAck:
+    return m_proposer.process_noack(dynamic_cast<Message::NoAck &>(*msg.get()));
+  case Message::Type::ConsensusReached:
+    notify_if_consensus_reached(msg);
   }
   return {};
 }
