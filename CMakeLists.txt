@@ -16,6 +16,10 @@ add_library(libpaxos SHARED
     ${SRCS}
 )
 
+add_executable(paxos_server src/server.cpp)
+
+TARGET_LINK_LIBRARIES(paxos_server libpaxos)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_include_directories(libpaxos PUBLIC
