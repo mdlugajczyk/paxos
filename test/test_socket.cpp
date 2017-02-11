@@ -1,5 +1,6 @@
 #include "socket.h"
 #include "gtest/gtest.h"
+#include <future>
 
 using namespace std;
 
@@ -26,6 +27,21 @@ TEST_F(SocketTest, MultipleSenders) {
   snd2.send("trololo");
   ASSERT_EQ(rcv.recv(), "foobarbaz");
   ASSERT_EQ(rcv.recv(), "trololo");
+}
+
+TEST_F(SocketTest, BlockUntilDataArrives) {
+  const unsigned short port = 8077;
+  const string rcv_host("localhost");
+  Receiver rcv(port);
+  auto future = std::async(std::launch::async, [&] { return rcv.recv(); });
+
+  ASSERT_EQ(future.wait_for(std::chrono::seconds(1)),
+            std::future_status::timeout);
+  ;
+
+  Sender snd(rcv_host, port);
+  snd.send("foobarbaz");
+  ASSERT_EQ(future.get(), "foobarbaz");
 }
 
 int main(int argc, char **argv) {
