@@ -8,6 +8,11 @@ class Socket {
 public:
   Socket();
   Socket(int fd);
+  int connect(const std::string &host, unsigned short port) const;
+  int bind(unsigned short port) const;
+  int listen() const;
+  std::string recv() const;
+  std::unique_ptr<Socket> accept() const;
   ~Socket();
   int get_fd() const;
 
