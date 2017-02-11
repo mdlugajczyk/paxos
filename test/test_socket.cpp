@@ -44,6 +44,16 @@ TEST_F(SocketTest, BlockUntilDataArrives) {
   ASSERT_EQ(future.get(), "foobarbaz");
 }
 
+TEST_F(SocketTest, LazilyConnect) {
+  const unsigned short port = 8077;
+  const string rcv_host("localhost");
+  Sender snd(rcv_host, port);
+  ASSERT_EQ(snd.send("foobarbaz"), false);
+  Receiver rcv(port);
+  ASSERT_EQ(snd.send("foobarbaz"), true);
+  ASSERT_EQ(rcv.recv(), "foobarbaz");
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();

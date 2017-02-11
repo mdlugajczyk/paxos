@@ -35,6 +35,10 @@ public:
   virtual bool send(const std::string &msg);
 
 private:
+  bool connect();
+  std::string m_host;
+  unsigned short m_port;
+  bool m_connected;
   std::unique_ptr<Socket> m_socket;
 };
 

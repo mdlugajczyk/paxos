@@ -1,5 +1,8 @@
 #include "socket.h"
+
+#include <cstring>
 #include <fcntl.h>
+#include <iostream>
 #include <netdb.h>
 #include <stdexcept>
 #include <sys/socket.h>
@@ -53,7 +56,7 @@ int Socket::connect(const std::string &host, unsigned short port) const {
     throw runtime_error("gethobyname failed for " + host);
   }
 
-  struct sockaddr_in server;
+  struct sockaddr_in server = {0};
   memcpy(&server.sin_addr, he->h_addr_list[0], he->h_length);
   server.sin_family = AF_INET;
   server.sin_port = htons(port);
@@ -86,12 +89,20 @@ string Receiver::recv() {
 }
 
 Sender::Sender(const string &host, unsigned short port)
-    : m_socket(make_unique<Socket>()) {
-  if (m_socket->connect(host, port) < 0) {
-    throw runtime_error("Failed to connect.");
-  }
+    : m_host(host), m_port(port), m_connected(false),
+      m_socket(make_unique<Socket>()) {
+  connect();
+}
+
+bool Sender::connect() {
+  if (m_connected)
+    return true;
+  m_connected = m_socket->connect(m_host, m_port) >= 0;
+  return m_connected;
 }
 
 bool Sender::send(const string &msg) {
+  if (!connect())
+    return false;
   return ::send(m_socket->get_fd(), msg.c_str(), msg.size(), 0) >= 0;
 }
