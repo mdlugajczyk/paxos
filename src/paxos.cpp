@@ -161,3 +161,8 @@ Node::process_message(std::shared_ptr<Message::Message> msg) {
   }
   return {};
 }
+
+std::shared_ptr<Message::Message>
+Node::propose_value(const std::string &value) {
+  return m_proposer.request_permission(value);
+}

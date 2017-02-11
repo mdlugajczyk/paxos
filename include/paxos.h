@@ -71,6 +71,7 @@ class Node {
 public:
   Node(int quorum_size, const std::string &node_name,
        const std::string &data_directory);
+  std::shared_ptr<Message::Message> propose_value(const std::string &value);
   std::shared_ptr<Message::Message>
   process_message(std::shared_ptr<Message::Message> msg);
 
