@@ -40,7 +40,7 @@ private:
   virtual void serialize_impl(Persistence::Serializer &serializer) const = 0;
 };
 
-std::unique_ptr<Message> deserialize(const std::string &serialized_msg);
+std::shared_ptr<Message> deserialize(const std::string &serialized_msg);
 
 class PrepareMessage : public Message {
 public:

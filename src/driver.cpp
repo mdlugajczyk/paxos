@@ -20,9 +20,8 @@ void PaxosDriver::run() {
   if (!m_value.empty()) {
   }
 
-  //  Serializer serializer;
   while (1) {
     const std::string response = m_receiver.recv();
-    std::unique_ptr<Message> msg = deserialize(response);
+    std::shared_ptr<Message> msg = deserialize(response);
   }
 }

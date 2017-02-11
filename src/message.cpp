@@ -109,7 +109,7 @@ void ConsensusReached::serialize_impl(Serializer &s) const {
   s.serialize(m_value);
 }
 
-std::unique_ptr<Paxos::Message::Message>
+std::shared_ptr<Paxos::Message::Message>
 Paxos::Message::deserialize(const std::string &serialized_message) {
   Deserializer d(serialized_message);
   const Type type = static_cast<Type>(d.deserialize<int>());
@@ -118,27 +118,27 @@ Paxos::Message::deserialize(const std::string &serialized_message) {
   if (type == Type::NoAck) {
     ProposalID rejected_proposal = d.deserialize<ProposalID>();
     ProposalID accepted_proposal = d.deserialize<ProposalID>();
-    return std::make_unique<Paxos::Message::NoAck>(sender_id, rejected_proposal,
+    return std::make_shared<Paxos::Message::NoAck>(sender_id, rejected_proposal,
                                                    accepted_proposal);
   }
 
   const std::string value = d.deserialize<std::string>();
 
   if (type == Type::ConsensusReached) {
-    return std::make_unique<Paxos::Message::ConsensusReached>(sender_id, value);
+    return std::make_shared<Paxos::Message::ConsensusReached>(sender_id, value);
   }
 
   const ProposalID proposal = d.deserialize<ProposalID>();
   switch (type) {
   case Type::Prepare:
-    return std::make_unique<Paxos::Message::PrepareMessage>(proposal, value);
+    return std::make_shared<Paxos::Message::PrepareMessage>(proposal, value);
   case Type::Promise:
-    return std::make_unique<Paxos::Message::PromiseMessage>(proposal, sender_id,
+    return std::make_shared<Paxos::Message::PromiseMessage>(proposal, sender_id,
                                                             value);
   case Type::Accept:
-    return std::make_unique<Paxos::Message::AcceptMessage>(proposal, value);
+    return std::make_shared<Paxos::Message::AcceptMessage>(proposal, value);
   case Type::Accepted:
-    return std::make_unique<Paxos::Message::AcceptedMessage>(proposal,
+    return std::make_shared<Paxos::Message::AcceptedMessage>(proposal,
                                                              sender_id, value);
   case Type::NoAck:
   case Type::ConsensusReached:
