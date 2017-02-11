@@ -53,6 +53,7 @@ set (CMAKE_CXX_FLAGS "-fsanitize=address")
 ADD_EXECUTABLE(test_paxos test_paxos.cpp)
 ADD_EXECUTABLE(test_message test_message.cpp)
 ADD_EXECUTABLE(test_state_persister test_state_persister.cpp)
+ADD_EXECUTABLE(test_socket test_socket.cpp)
 
 TARGET_LINK_LIBRARIES(test_paxos
     libpaxos
@@ -75,6 +76,12 @@ TARGET_LINK_LIBRARIES(test_state_persister
     libtest_fakes
 )
 
+  TARGET_LINK_LIBRARIES(test_socket
+    libpaxos
+    libgtest
+    libgmock
+)
+
 add_test(NAME test_paxos
   COMMAND test_paxos)
 
@@ -83,3 +90,6 @@ add_test(NAME test_message
 
 add_test(NAME test_state_persister
   COMMAND test_state_persister)
+
+add_test(NAME test_socket
+  COMMAND test_socket)
