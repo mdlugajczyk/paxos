@@ -54,6 +54,17 @@ TEST_F(SocketTest, LazilyConnect) {
   ASSERT_EQ(rcv.recv(), "foobarbaz");
 }
 
+TEST_F(SocketTest, SendTwice) {
+  const unsigned short port = 8077;
+  const string rcv_host("localhost");
+  Sender snd(rcv_host, port);
+  Receiver rcv(port);
+  ASSERT_EQ(snd.send("foobarbaz"), true);
+  ASSERT_EQ(rcv.recv(), "foobarbaz");
+  ASSERT_EQ(snd.send("trololo"), true);
+  ASSERT_EQ(rcv.recv(), "trololo");
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();

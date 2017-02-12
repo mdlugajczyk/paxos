@@ -89,16 +89,11 @@ string Receiver::recv() {
 }
 
 Sender::Sender(const string &host, unsigned short port)
-    : m_host(host), m_port(port), m_connected(false),
-      m_socket(make_unique<Socket>()) {
-  connect();
-}
+    : m_host(host), m_port(port) {}
 
 bool Sender::connect() {
-  if (m_connected)
-    return true;
-  m_connected = m_socket->connect(m_host, m_port) >= 0;
-  return m_connected;
+  m_socket = make_unique<Socket>();
+  return m_socket->connect(m_host, m_port) >= 0;
 }
 
 bool Sender::send(const string &msg) {
