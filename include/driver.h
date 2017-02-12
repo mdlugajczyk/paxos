@@ -21,6 +21,8 @@ public:
   void run();
 
 private:
+  void broadcast(const std::string &msg);
+  unsigned int m_quorum_size;
   Paxos::Node m_paxos_node;
   Receiver m_receiver;
   std::string m_value;

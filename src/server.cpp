@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  const unsigned short port = to_short(argv[1]);
+  const unsigned short port = to_short(argv[2]);
 
   vector<Host> hosts;
   for (int i = 4; i < argc - 1; i += 2) {
@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 
   std::cout << value.empty() << endl;
 
-  PaxosDriver driver(hosts, port, argv[2], argv[3], value);
+  PaxosDriver driver(hosts, port, argv[1], argv[3], value);
 
   driver.run();
 
