@@ -123,11 +123,11 @@ TEST_F(MessageTest, SerializeNoAckMessage) {
   const std::string serialized = msg.serialize();
   const auto deserialized = Message::deserialize(serialized);
   ASSERT_EQ(msg.m_type, deserialized->m_type);
-  const auto prepare_msg = dynamic_cast<Message::NoAck &>(*deserialized);
-  ASSERT_EQ(msg.m_sender_id, prepare_msg.m_sender_id);
-  ASSERT_EQ(msg.m_rejected_proposal, prepare_msg.m_rejected_proposal);
-  ASSERT_EQ(msg.m_accepted_proposal, prepare_msg.m_accepted_proposal);
-  ASSERT_EQ(msg.m_accepted_value, prepare_msg.m_accepted_value);
+  const auto noack_msg = dynamic_cast<Message::NoAck &>(*deserialized);
+  ASSERT_EQ(msg.m_sender_id, noack_msg.m_sender_id);
+  ASSERT_EQ(msg.m_rejected_proposal, noack_msg.m_rejected_proposal);
+  ASSERT_EQ(msg.m_accepted_proposal, noack_msg.m_accepted_proposal);
+  ASSERT_EQ(msg.m_accepted_value, noack_msg.m_accepted_value);
 }
 
 int main(int argc, char **argv) {
