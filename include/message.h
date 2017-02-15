@@ -96,9 +96,10 @@ private:
 class NoAck : public Message {
 public:
   NoAck(const NodeID &sender_id, const ProposalID &rejected_proposal,
-        const ProposalID &accepted_proposal);
+        const ProposalID &accepted_proposal, const std::string &accepted_value);
   const ProposalID m_rejected_proposal;
   const ProposalID m_accepted_proposal;
+  const std::string m_accepted_value;
 
 private:
   void serialize_impl(Persistence::Serializer &serializer) const;

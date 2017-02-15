@@ -35,7 +35,7 @@ TEST_F(PaxosTest, ReceiveLessThanQuorumRejectedMessagesAfterProposal) {
   Proposer p("foo", 2);
   const auto permission_msg = p.request_permission("value");
   const Message::NoAck noack("bar", permission_msg->m_proposal_id,
-                             ProposalID("baz", 2));
+                             ProposalID("baz", 2), "");
   const auto nack_response = p.process_noack(noack);
   ASSERT_FALSE(nack_response);
 }
@@ -45,10 +45,10 @@ TEST_F(PaxosTest, IfQuorumRejectedProposalShouldSendNew) {
   const auto permission_msg = p.request_permission("value");
   const ProposalID accepted_proposal("baz", 3);
   const Message::NoAck noack1("bar", permission_msg->m_proposal_id,
-                              accepted_proposal);
+                              accepted_proposal, "");
   p.process_noack(noack1);
   const Message::NoAck noack2("baz", permission_msg->m_proposal_id,
-                              accepted_proposal);
+                              accepted_proposal, "");
   const auto noack_response = p.process_noack(noack2);
   ASSERT_TRUE(noack_response);
   ASSERT_EQ(noack_response->m_sender_id, "foo");
@@ -62,9 +62,9 @@ TEST_F(PaxosTest, IgnoreQuorumRejectingSomeoneElseProposal) {
   const auto permission_msg = p.request_permission("value");
   const ProposalID accepted_proposal("baz", 3);
   const ProposalID rejected_proposal("bar", 4);
-  const Message::NoAck noack1("bar", rejected_proposal, accepted_proposal);
+  const Message::NoAck noack1("bar", rejected_proposal, accepted_proposal, "");
   p.process_noack(noack1);
-  const Message::NoAck noack2("baz", rejected_proposal, accepted_proposal);
+  const Message::NoAck noack2("baz", rejected_proposal, accepted_proposal, "");
   const auto noack_response = p.process_noack(noack2);
   ASSERT_FALSE(noack_response);
 }
@@ -73,7 +73,8 @@ TEST_F(PaxosTest, CheckNoAcksForHighestProposalID) {
   Proposer p("foo", 2);
   p.request_permission("value");
   const ProposalID accepted_proposal("bar", 4);
-  const Message::NoAck noack("bar", ProposalID("baz", 3), accepted_proposal);
+  const Message::NoAck noack("bar", ProposalID("baz", 3), accepted_proposal,
+                             "");
   p.process_noack(noack);
   const auto permission_request = p.request_permission("value");
   ASSERT_EQ(permission_request->m_proposal_id,

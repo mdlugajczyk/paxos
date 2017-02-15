@@ -72,14 +72,14 @@ Acceptor::process_prepare(const Message::PrepareMessage &prepare) {
   }
 
   return std::make_shared<Message::NoAck>(m_node_id, prepare.m_proposal_id,
-                                          m_highest_proposal);
+                                          m_highest_proposal, "");
 }
 
 std::shared_ptr<Message::Message>
 Acceptor::process_accept(const Message::AcceptMessage &accept) {
   if (accept.m_proposal_id < m_highest_proposal)
     return std::make_shared<Message::NoAck>(m_node_id, accept.m_proposal_id,
-                                            m_highest_proposal);
+                                            m_highest_proposal, "");
   m_highest_proposal = accept.m_proposal_id;
   m_value = accept.m_value;
   m_state_persister->persist(State(m_value, m_highest_proposal));

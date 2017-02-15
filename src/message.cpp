@@ -65,13 +65,16 @@ void PrepareMessage::serialize_impl(Serializer &s) const {
 }
 
 NoAck::NoAck(const NodeID &sender_id, const ProposalID &rejected_proposal,
-             const ProposalID &accepted_proposal)
+             const ProposalID &accepted_proposal,
+             const std::string &accepted_value)
     : Message(Type::NoAck, sender_id), m_rejected_proposal(rejected_proposal),
-      m_accepted_proposal(accepted_proposal) {}
+      m_accepted_proposal(accepted_proposal), m_accepted_value(accepted_value) {
+}
 
 void NoAck::serialize_impl(Serializer &s) const {
   s.serialize(m_rejected_proposal.serialize());
   s.serialize(m_accepted_proposal.serialize());
+  s.serialize(m_accepted_value);
 }
 
 PromiseMessage::PromiseMessage(const ProposalID &id, const NodeID &node_id,
@@ -118,8 +121,9 @@ Paxos::Message::deserialize(const std::string &serialized_message) {
   if (type == Type::NoAck) {
     ProposalID rejected_proposal = d.deserialize<ProposalID>();
     ProposalID accepted_proposal = d.deserialize<ProposalID>();
-    return std::make_shared<Paxos::Message::NoAck>(sender_id, rejected_proposal,
-                                                   accepted_proposal);
+    const std::string accepted_value = d.deserialize<std::string>();
+    return std::make_shared<Paxos::Message::NoAck>(
+        sender_id, rejected_proposal, accepted_proposal, accepted_value);
   }
 
   const std::string value = d.deserialize<std::string>();

@@ -118,8 +118,8 @@ TEST_F(MessageTest, SerializeConsensusReachedMessage) {
 }
 
 TEST_F(MessageTest, SerializeNoAckMessage) {
-  const Message::NoAck msg("sender", ProposalID("foo", 3),
-                           ProposalID("bar", 4));
+  const Message::NoAck msg("sender", ProposalID("foo", 3), ProposalID("bar", 4),
+                           "foo");
   const std::string serialized = msg.serialize();
   const auto deserialized = Message::deserialize(serialized);
   ASSERT_EQ(msg.m_type, deserialized->m_type);
@@ -127,6 +127,7 @@ TEST_F(MessageTest, SerializeNoAckMessage) {
   ASSERT_EQ(msg.m_sender_id, prepare_msg.m_sender_id);
   ASSERT_EQ(msg.m_rejected_proposal, prepare_msg.m_rejected_proposal);
   ASSERT_EQ(msg.m_accepted_proposal, prepare_msg.m_accepted_proposal);
+  ASSERT_EQ(msg.m_accepted_value, prepare_msg.m_accepted_value);
 }
 
 int main(int argc, char **argv) {
