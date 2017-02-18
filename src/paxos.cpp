@@ -72,7 +72,7 @@ Acceptor::process_prepare(const Message::PrepareMessage &prepare) {
   }
 
   return std::make_shared<Message::NoAck>(m_node_id, prepare.m_proposal_id,
-                                          m_highest_proposal, "");
+                                          m_highest_proposal, m_value);
 }
 
 std::shared_ptr<Message::Message>
