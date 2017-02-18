@@ -192,6 +192,19 @@ TEST_F(PaxosTest, NoAckShouldIncludeAcceptedValue) {
   ASSERT_EQ(noack_msg.m_accepted_value, "foo value");
 }
 
+TEST_F(PaxosTest, NoAckFromAcceptRequestShouldIncludeAcceptedValue) {
+  Acceptor a("foo", std::make_shared<FakeStatePersister>(
+                        Paxos::State("", ProposalID())));
+  const Message::PrepareMessage prepare_msg(ProposalID("bar", 2), "foo value");
+  a.process_prepare(prepare_msg);
+  a.process_accept(Message::AcceptMessage(ProposalID("bar", 2), "foo value"));
+  const auto response = a.process_accept(Message::AcceptMessage(
+      Message::AcceptMessage(ProposalID("asdf", 1), "new-value")));
+  ASSERT_EQ(response->m_type, Message::Type::NoAck);
+  const auto noack_msg = dynamic_cast<Message::NoAck &>(*response);
+  ASSERT_EQ(noack_msg.m_accepted_value, "foo value");
+}
+
 TEST_F(PaxosTest, AcceptorSendsEmptyValueInPromiseBeforeAnyMessageIsAccepted) {
   Acceptor a("foo", std::make_shared<FakeStatePersister>(
                         Paxos::State("", ProposalID())));
