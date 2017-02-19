@@ -23,6 +23,8 @@ Proposer::process_noack(const Message::NoAck &noack) {
     m_highest_proposal = noack.m_accepted_proposal;
   if (m_current_proposal != noack.m_rejected_proposal)
     return {};
+  if (!noack.m_accepted_value.empty())
+    m_value = noack.m_accepted_value;
   m_noack_senders.push_back(noack.m_sender_id);
   if (m_noack_senders.size() >= m_quorum_size)
     return request_permission(m_value);

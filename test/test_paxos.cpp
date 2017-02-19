@@ -156,6 +156,17 @@ TEST_F(PaxosTest, ProposerChecksValueFromThePromiseMessage) {
   ASSERT_EQ(prepare_msg2->m_value, "different value");
 }
 
+TEST_F(PaxosTest, ProposerChecksNoAcksForValue) {
+  Proposer p("foo", 2);
+  const auto prepare_msg = p.request_permission("value");
+  p.process_noack(Message::NoAck(
+      "bar", prepare_msg->m_proposal_id,
+      ProposalID("fnord", prepare_msg->m_proposal_id.m_proposal_id + 1),
+      "new value"));
+  const auto prepare_msg2 = p.request_permission("value");
+  ASSERT_EQ(prepare_msg2->m_value, "new value");
+}
+
 TEST_F(PaxosTest, AcceptorRespondsWithPromiseToPrepareMessage) {
   Acceptor a("foo", std::make_shared<FakeStatePersister>(
                         Paxos::State("", ProposalID())));
