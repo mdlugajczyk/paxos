@@ -25,6 +25,7 @@ public:
   process_promise(const Message::PromiseMessage &noack);
 
 private:
+  void maybe_update_state(const Message::PromiseMessage &promise);
   const std::string m_node_id;
   const int m_quorum_size;
   std::string m_value;

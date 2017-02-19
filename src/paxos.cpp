@@ -31,11 +31,7 @@ Proposer::process_noack(const Message::NoAck &noack) {
 
 std::shared_ptr<Message::AcceptMessage>
 Proposer::process_promise(const Message::PromiseMessage &promise) {
-  if (m_highest_proposal < promise.m_proposal_id) {
-    m_highest_proposal = promise.m_proposal_id;
-    if (!promise.m_value.empty())
-      m_value = promise.m_value;
-  }
+  maybe_update_state(promise);
   if (promise.m_proposal_id != m_current_proposal)
     return {};
   m_promise_senders.push_back(promise.m_sender_id);
@@ -43,6 +39,16 @@ Proposer::process_promise(const Message::PromiseMessage &promise) {
     return std::make_shared<Message::AcceptMessage>(m_current_proposal,
                                                     m_value);
   return {};
+}
+
+void Proposer::maybe_update_state(const Message::PromiseMessage &promise) {
+  if (promise.m_proposal_id < m_highest_proposal)
+    return;
+  if (!promise.m_value.empty())
+    m_value = promise.m_value;
+  if (m_highest_proposal < promise.m_proposal_id) {
+    m_highest_proposal = promise.m_proposal_id;
+  }
 }
 
 Proposer::Proposer(const std::string &id, const int quorum_size)

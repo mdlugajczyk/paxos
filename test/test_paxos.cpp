@@ -118,10 +118,12 @@ TEST_F(PaxosTest, CheckPromisesForHigherProposalID) {
   const auto prepare_msg = p.request_permission("value");
   p.process_promise(Message::PromiseMessage(
       ProposalID("foo", prepare_msg->m_proposal_id.m_proposal_id + 1), "baz",
-      "value"));
+      "new value"));
   const auto prepare_msg2 = p.request_permission("value");
   ASSERT_EQ(prepare_msg2->m_proposal_id.m_proposal_id,
             prepare_msg->m_proposal_id.m_proposal_id + 2);
+
+  ASSERT_EQ(prepare_msg2->m_value, "new value");
 }
 
 TEST_F(PaxosTest, ProposerCheckPromisesWithHigherProposalID) {
@@ -142,6 +144,16 @@ TEST_F(PaxosTest, ProposerIgnorsEmptyValueInPromiseMessage) {
       ""));
   const auto prepare_msg2 = p.request_permission("value");
   ASSERT_EQ(prepare_msg2->m_value, "value");
+}
+
+TEST_F(PaxosTest, ProposerChecksValueFromThePromiseMessage) {
+  Proposer p("foo", 2);
+  const auto prepare_msg = p.request_permission("value");
+  p.process_promise(Message::PromiseMessage(
+      ProposalID("foo", prepare_msg->m_proposal_id.m_proposal_id), "baz",
+      "different value"));
+  const auto prepare_msg2 = p.request_permission("value");
+  ASSERT_EQ(prepare_msg2->m_value, "different value");
 }
 
 TEST_F(PaxosTest, AcceptorRespondsWithPromiseToPrepareMessage) {
