@@ -3,7 +3,7 @@
 
 using namespace Paxos;
 using namespace Paxos::Message;
-using namespace Paxos::Persistence;
+using namespace Paxos::Serialization;
 
 ProposalID::ProposalID(const NodeID &node_id, const int proposal_id)
     : m_node_id(node_id), m_proposal_id(proposal_id) {}

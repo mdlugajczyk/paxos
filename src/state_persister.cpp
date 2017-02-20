@@ -12,7 +12,7 @@ StatePersister::StatePersister(const std::string &file) : m_filename(file) {}
 
 StatePersister::~StatePersister() {}
 void StatePersister::persist(const State &state) {
-  Persistence::Serializer s;
+  Serialization::Serializer s;
   s.serialize(state.m_value);
   s.serialize(state.m_proposal.serialize());
   const std::string serialized_data = s.str();
@@ -32,7 +32,7 @@ State StatePersister::restore() {
   char buffer[size];
   fread(buffer, 1, size, f);
   fclose(f);
-  Persistence::Deserializer d(std::string(buffer, size));
+  Serialization::Deserializer d(std::string(buffer, size));
   try {
     const std::string value = d.deserialize<std::string>();
     const ProposalID proposal = d.deserialize<ProposalID>();

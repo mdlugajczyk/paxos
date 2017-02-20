@@ -3,7 +3,7 @@
 #include <iostream>
 
 using namespace Paxos::Message;
-using namespace Paxos::Persistence;
+using namespace Paxos::Serialization;
 using namespace std;
 Host::Host(const string &host, unsigned short port)
     : m_host(host), m_port(port) {}

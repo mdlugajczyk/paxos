@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace Paxos {
-namespace Persistence {
+namespace Serialization {
 
 class Serializer {
 public:

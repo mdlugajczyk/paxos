@@ -20,7 +20,7 @@ struct ProposalID {
   int m_proposal_id;
 };
 
-namespace Persistence {
+namespace Serialization {
   class Serializer;
 }
 
@@ -37,7 +37,7 @@ public:
   const NodeID m_sender_id;
 
 private:
-  virtual void serialize_impl(Persistence::Serializer &serializer) const = 0;
+  virtual void serialize_impl(Serialization::Serializer &serializer) const = 0;
 };
 
 std::shared_ptr<Message> deserialize(const std::string &serialized_msg);
@@ -49,7 +49,7 @@ public:
   const ProposalID m_proposal_id;
 
 private:
-  void serialize_impl(Persistence::Serializer &serializer) const;
+  void serialize_impl(Serialization::Serializer &serializer) const;
 };
 
 class PromiseMessage : public Message {
@@ -60,7 +60,7 @@ public:
   const ProposalID m_proposal_id;
 
 private:
-  void serialize_impl(Persistence::Serializer &serializer) const;
+  void serialize_impl(Serialization::Serializer &serializer) const;
 };
 
 class AcceptMessage : public Message {
@@ -70,7 +70,7 @@ public:
   const ProposalID m_proposal_id;
 
 private:
-  void serialize_impl(Persistence::Serializer &serializer) const;
+  void serialize_impl(Serialization::Serializer &serializer) const;
 };
 
 class AcceptedMessage : public Message {
@@ -81,7 +81,7 @@ public:
   const ProposalID m_proposal_id;
 
 private:
-  void serialize_impl(Persistence::Serializer &serializer) const;
+  void serialize_impl(Serialization::Serializer &serializer) const;
 };
 
 class ConsensusReached : public Message {
@@ -90,7 +90,7 @@ public:
   const std::string m_value;
 
 private:
-  void serialize_impl(Persistence::Serializer &serializer) const;
+  void serialize_impl(Serialization::Serializer &serializer) const;
 };
 
 class NoAck : public Message {
@@ -102,7 +102,7 @@ public:
   const std::string m_accepted_value;
 
 private:
-  void serialize_impl(Persistence::Serializer &serializer) const;
+  void serialize_impl(Serialization::Serializer &serializer) const;
 };
 }
 }
