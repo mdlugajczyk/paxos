@@ -1,5 +1,5 @@
 #include "message.h"
-#include "persistence.h"
+#include "serialization.h"
 
 using namespace Paxos;
 using namespace Paxos::Message;
